@@ -39,6 +39,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
     updatedAt: new Date().toISOString(),
   });
   const [termMonths, setTermMonths] = useState<number>(0);
+  const [rateStr, setRateStr] = useState(String(initial?.annualRate ?? ""));
 
   function set<K extends keyof Loan>(k: K, v: Loan[K]) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -46,9 +47,9 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
 
   function calcMonthlyPayment() {
     const balance = form.currentBalance > 0 ? form.currentBalance : form.principal;
-    if (balance <= 0 || form.annualRate <= 0 || termMonths <= 0) return;
+    if (balance <= 0 || termMonths <= 0) return;
     const r = form.annualRate / 100 / 12;
-    const pmt = balance * r / (1 - Math.pow(1 + r, -termMonths));
+    const pmt = r === 0 ? balance / termMonths : balance * r / (1 - Math.pow(1 + r, -termMonths));
     set("monthlyPayment", Math.ceil(pmt));
   }
 
@@ -78,8 +79,19 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
           {form.currentBalance > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.currentBalance)}</span>}
           {balanceError && <span className="mt-1 block text-xs text-red-500">現在残高は当初借入額以下にしてください</span>}
         </Row>
-        <Row label="年利（%）" required>
-          <input type="number" step="0.01" min={0} className={input} value={form.annualRate || ""} onChange={(e) => set("annualRate", Number(e.target.value))} required />
+        <Row label="年利（%）">
+          <input
+            type="number"
+            step="0.01"
+            min={0}
+            className={input}
+            value={rateStr}
+            onChange={(e) => { setRateStr(e.target.value); set("annualRate", e.target.value === "" ? 0 : Number(e.target.value)); }}
+            placeholder="0 = 無利子"
+          />
+          {rateStr === "0" && (
+            <span className="mt-1 block text-xs text-emerald-600">無利子（知人への借入など）</span>
+          )}
         </Row>
         <Row label="月次返済額（円）" required>
           <input type="number" min={0} className={input} value={form.monthlyPayment || ""} onChange={(e) => set("monthlyPayment", Number(e.target.value))} required />
