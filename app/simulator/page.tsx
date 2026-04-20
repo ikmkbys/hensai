@@ -99,7 +99,7 @@ export default function SimulatorPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} label={{ value: "ヶ月", position: "insideBottomRight", offset: -2, fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万`} />
-                  <Tooltip formatter={(v: number) => fmtJPY(v)} />
+                  <Tooltip formatter={(v) => fmtJPY(v as number)} />
                   <Legend />
                   <Line type="monotone" dataKey="現状" stroke="#94a3b8" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="シミュレーション" stroke="#6366f1" strokeWidth={2} dot={false} />

@@ -131,7 +131,7 @@ export default function HomePage() {
                 <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
                   {pieData.map((d, i) => <Cell key={i} fill={d.color || "#6366f1"} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => fmtJPY(v)} />
+                <Tooltip formatter={(v) => fmtJPY(v as number)} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -144,7 +144,7 @@ export default function HomePage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={40} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万`} />
-                <Tooltip formatter={(v: number) => fmtJPY(v)} />
+                <Tooltip formatter={(v) => fmtJPY(v as number)} />
                 <Legend />
                 <Line type="monotone" dataKey="残高" stroke="#6366f1" strokeWidth={2} dot={false} />
               </LineChart>

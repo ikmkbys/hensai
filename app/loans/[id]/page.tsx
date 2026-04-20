@@ -126,7 +126,7 @@ export default function LoanDetailPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
               <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={30} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万`} />
-              <Tooltip formatter={(v: number) => fmtJPY(v)} />
+              <Tooltip formatter={(v) => fmtJPY(v as number)} />
               <Legend />
               <Bar dataKey="元金" stackId="a" fill={loan.color} />
               <Bar dataKey="利息" stackId="a" fill="#cbd5e1" />
