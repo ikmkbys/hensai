@@ -99,14 +99,40 @@ export default function HelpPage() {
       {/* データ管理 */}
       <Section title="💾 データのバックアップ">
         <p className="text-sm text-slate-700">
-          HENSAIのデータはこの端末のブラウザ（localStorage）にのみ保存されています。サーバーには一切送信されません。
+          HENSAIのデータはサーバーに送信されず、<strong>このブラウザにのみ保存</strong>されています。プライバシーに配慮した設計ですが、ブラウザの設定変更や端末の切り替えによってデータが失われることがあります。
         </p>
+
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 text-sm">
+          <table className="w-full">
+            <thead className="bg-slate-50 text-xs text-slate-500">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium">操作</th>
+                <th className="px-3 py-2 text-center font-medium">データ</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {[
+                ["キャッシュをクリア", "消えない ✅"],
+                ["Cookieをクリア", "消えない ✅"],
+                ["サイトデータ / ローカルストレージを削除", "消える ❌"],
+                ["シークレットモードを閉じる", "消える ❌"],
+                ["別ブラウザ・別端末で開く", "表示されない ❌"],
+              ].map(([op, result]) => (
+                <tr key={op}>
+                  <td className="px-3 py-2 text-slate-700">{op}</td>
+                  <td className="px-3 py-2 text-center">{result}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <div className="mt-3 space-y-2">
-          <Item title="CSV エクスポート">「設定」→「CSVエクスポート」で全データをファイルに保存できます。定期的なバックアップをおすすめします。</Item>
-          <Item title="CSV インポート">機種変更・ブラウザ変更時は、エクスポートしたCSVを「設定」→「CSVインポート」で読み込めます。</Item>
+          <Item title="CSV エクスポート">「設定」→「CSVエクスポート」で全データ（借入情報・返済履歴・金利変更履歴）をまとめてファイルに保存できます。月に1回程度のバックアップをおすすめします。</Item>
+          <Item title="CSV インポート">ブラウザ変更・端末変更時は、エクスポートしたCSVを「設定」→「CSVインポート」で読み込むとデータを完全に復元できます。</Item>
         </div>
         <Callout type="warn">
-          ⚠️ ブラウザのキャッシュ削除や「サイトデータを消去」を実行するとデータが消えます。定期的にCSVエクスポートしてください。
+          ⚠️ データの紛失については責任を負いかねます。大切なデータを守るため、定期的なCSVエクスポートをお願いします。
         </Callout>
       </Section>
 

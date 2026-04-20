@@ -8,6 +8,7 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
+import BackupNoticeModal from "@/components/BackupNoticeModal";
 
 export default function HomePage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -77,7 +78,9 @@ export default function HomePage() {
 
   if (loans.length === 0) {
     return (
-      <div className="grid place-items-center py-16 text-center">
+      <>
+        <BackupNoticeModal />
+        <div className="grid place-items-center py-16 text-center">
         <div className="max-w-md">
           <div className="mb-6 text-6xl">🎯</div>
           <h1 className="mb-3 text-2xl font-bold">前向きに、クリアしていこう</h1>
@@ -93,6 +96,7 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+      </>
     );
   }
 
@@ -100,6 +104,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
+      <BackupNoticeModal />
       {unpaid.length > 0 && (
         <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           <span>今月の返済記録を忘れずに（{unpaid.length} 件）</span>
@@ -229,6 +234,10 @@ export default function HomePage() {
           })}
         </div>
       </section>
+      <p className="text-center text-xs text-slate-400">
+        💾 データはこの端末のブラウザにのみ保存されます。{" "}
+        <Link href="/settings" className="underline hover:text-slate-600">定期的なCSVバックアップ</Link>をおすすめします。
+      </p>
     </div>
   );
 }
