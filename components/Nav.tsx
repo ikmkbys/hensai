@@ -7,6 +7,7 @@ const items = [
   { href: "/loans", label: "借入一覧" },
   { href: "/simulator", label: "シミュレーター" },
   { href: "/settings", label: "設定" },
+  { href: "/help", label: "ヘルプ" },
 ];
 
 export default function Nav() {
