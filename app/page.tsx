@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { loadData } from "@/lib/storage";
 import { Loan } from "@/lib/types";
-import { buildSchedule, calcConsecutiveMonths, calcStats, calcTotalPaid, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct } from "@/lib/calc";
+import { buildSchedule, calcConsecutiveMonths, calcStats, calcTotalPaid, currentMonthPayment, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct } from "@/lib/calc";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
@@ -19,7 +19,7 @@ export default function HomePage() {
   }, []);
 
   const totalBalance = loans.reduce((s, l) => s + l.currentBalance, 0);
-  const totalMonthly = loans.reduce((s, l) => s + l.monthlyPayment, 0);
+  const totalMonthly = loans.reduce((s, l) => s + currentMonthPayment(l), 0);
   const totalPrincipal = loans.reduce((s, l) => s + l.principal, 0);
   const paid = Math.max(0, totalPrincipal - totalBalance);
   const pct = totalPrincipal > 0 ? (paid / totalPrincipal) * 100 : 0;

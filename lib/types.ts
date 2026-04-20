@@ -20,7 +20,10 @@ export type Loan = {
   principal: number;
   currentBalance: number;
   annualRate: number;          // 初期金利
-  monthlyPayment: number;
+  monthlyPayment: number;      // 定額方式の月次返済額
+  repayType?: "fixed" | "revolving";  // 返済方式（省略時 = fixed）
+  revolvingRate?: number;      // リボ：毎月支払い率（%）例：1.0
+  revolvingMin?: number;       // リボ：最低支払額（円）例：5000
   startDate: string;
   paymentDay: number;
   color: string;

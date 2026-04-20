@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import LoanForm from "@/components/LoanForm";
 import { deleteLoan, getLoan, upsertLoan } from "@/lib/storage";
 import { Loan } from "@/lib/types";
-import { buildSchedule, calcStats, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct } from "@/lib/calc";
+import { buildSchedule, calcStats, currentMonthPayment, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct } from "@/lib/calc";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from "recharts";
@@ -78,7 +78,12 @@ export default function LoanDetailPage() {
 
       <section className="grid gap-3 sm:grid-cols-4">
         <Stat label="現在残高" value={fmtJPY(loan.currentBalance)} />
-        <Stat label="月々返済" value={fmtJPY(loan.monthlyPayment)} />
+        <Stat
+          label={loan.repayType === "revolving" ? "今月の返済（目安）" : "月々返済"}
+          value={loan.repayType === "revolving"
+            ? `${fmtJPY(currentMonthPayment(loan))}（残高の${loan.revolvingRate ?? 1}%）`
+            : fmtJPY(loan.monthlyPayment)}
+        />
         <Stat label="完済予定" value={stats.feasible ? (stats.finishDate ?? "—") : "要再計画"} />
         <Stat label="利息総額（予測）" value={fmtJPY(stats.totalInterest)} />
       </section>

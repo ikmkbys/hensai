@@ -29,6 +29,9 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
     currentBalance: initial?.currentBalance ?? 0,
     annualRate: initial?.annualRate ?? 0,
     monthlyPayment: initial?.monthlyPayment ?? 0,
+    repayType: initial?.repayType ?? "fixed",
+    revolvingRate: initial?.revolvingRate ?? 1,
+    revolvingMin: initial?.revolvingMin ?? 5000,
     startDate: initial?.startDate ?? today,
     paymentDay: initial?.paymentDay ?? 27,
     color: initial?.color ?? firstUnusedColor(usedColors),
@@ -69,6 +72,24 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
       <Row label="借入先">
         <input className={input} value={form.lender} onChange={(e) => set("lender", e.target.value)} placeholder="例：〇〇銀行" />
       </Row>
+      <Row label="返済方式">
+        <div className="flex gap-2">
+          {(["fixed", "revolving"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => set("repayType", t)}
+              className={`rounded-lg border px-4 py-2 text-sm transition ${
+                form.repayType === t
+                  ? "border-indigo-500 bg-indigo-50 font-medium text-indigo-700"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {t === "fixed" ? "定額（元利均等）" : "リボ払い（定率）"}
+            </button>
+          ))}
+        </div>
+      </Row>
       <div className="grid gap-5 sm:grid-cols-2">
         <Row label="当初借入額（円）" required>
           <input type="number" min={0} className={input} value={form.principal || ""} onChange={(e) => set("principal", Number(e.target.value))} required />
@@ -93,27 +114,40 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
             <span className="mt-1 block text-xs text-emerald-600">無利子（知人への借入など）</span>
           )}
         </Row>
-        <Row label="月次返済額（円）" required>
-          <input type="number" min={0} className={input} value={form.monthlyPayment || ""} onChange={(e) => set("monthlyPayment", Number(e.target.value))} required />
-          {form.monthlyPayment > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.monthlyPayment)}</span>}
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="number"
-              min={1}
-              placeholder="期間（ヶ月）"
-              className={`${input} w-32`}
-              value={termMonths || ""}
-              onChange={(e) => setTermMonths(Number(e.target.value))}
-            />
-            <button
-              type="button"
-              onClick={calcMonthlyPayment}
-              className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50"
-            >
-              自動計算
-            </button>
-          </div>
-        </Row>
+        {form.repayType === "revolving" ? (
+          <>
+            <Row label="毎月支払い率（%）" required>
+              <input type="number" step="0.1" min={0.1} className={input} value={form.revolvingRate || ""} onChange={(e) => set("revolvingRate", Number(e.target.value))} required placeholder="例：1.0" />
+              <span className="mt-1 block text-xs text-slate-400">残高 × この率 = 月の支払い額</span>
+            </Row>
+            <Row label="最低支払額（円）">
+              <input type="number" min={0} className={input} value={form.revolvingMin || ""} onChange={(e) => set("revolvingMin", Number(e.target.value))} placeholder="例：5000" />
+              {form.revolvingMin != null && form.revolvingMin > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.revolvingMin)}</span>}
+            </Row>
+          </>
+        ) : (
+          <Row label="月次返済額（円）" required>
+            <input type="number" min={0} className={input} value={form.monthlyPayment || ""} onChange={(e) => set("monthlyPayment", Number(e.target.value))} required />
+            {form.monthlyPayment > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.monthlyPayment)}</span>}
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                placeholder="期間（ヶ月）"
+                className={`${input} w-32`}
+                value={termMonths || ""}
+                onChange={(e) => setTermMonths(Number(e.target.value))}
+              />
+              <button
+                type="button"
+                onClick={calcMonthlyPayment}
+                className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50"
+              >
+                自動計算
+              </button>
+            </div>
+          </Row>
+        )}
         <Row label="開始日">
           <input type="date" className={input} value={form.startDate} onChange={(e) => set("startDate", e.target.value)} />
         </Row>
