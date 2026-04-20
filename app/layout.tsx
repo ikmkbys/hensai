@@ -13,8 +13,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-slate-50 text-slate-900">
         <Nav />
         <main className="mx-auto max-w-5xl px-4 py-6 md:py-10">{children}</main>
-        <footer className="mx-auto max-w-5xl px-4 py-8 text-center text-xs text-slate-400">
-          HENSAI — データはブラウザ内（localStorage）のみに保存されます
+        <footer className="mx-auto max-w-5xl border-t border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <a
+              href="https://stellars-lab.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-slate-500 hover:text-indigo-600 transition-colors"
+            >
+              Stellars Lab
+            </a>
+            <a href="/privacy" className="hover:text-slate-600 transition-colors">プライバシーポリシー</a>
+            <a href="/terms" className="hover:text-slate-600 transition-colors">利用規約</a>
+            <a href="/help" className="hover:text-slate-600 transition-colors">ヘルプ</a>
+          </div>
+          <p className="mt-3">© {new Date().getFullYear()} Stellars Lab. All rights reserved.</p>
         </footer>
       </body>
     </html>
