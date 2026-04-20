@@ -30,8 +30,12 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
     annualRate: initial?.annualRate ?? 0,
     monthlyPayment: initial?.monthlyPayment ?? 0,
     repayType: initial?.repayType ?? "fixed",
+    principalPerMonth: initial?.principalPerMonth ?? 0,
+    bonusPayment: initial?.bonusPayment ?? 0,
+    bonusMonths: initial?.bonusMonths ?? [],
     revolvingRate: initial?.revolvingRate ?? 1,
     revolvingMin: initial?.revolvingMin ?? 5000,
+    charges: initial?.charges ?? [],
     startDate: initial?.startDate ?? today,
     paymentDay: initial?.paymentDay ?? 27,
     color: initial?.color ?? firstUnusedColor(usedColors),
@@ -73,8 +77,12 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
         <input className={input} value={form.lender} onChange={(e) => set("lender", e.target.value)} placeholder="例：〇〇銀行" />
       </Row>
       <Row label="返済方式">
-        <div className="flex gap-2">
-          {(["fixed", "revolving"] as const).map((t) => (
+        <div className="flex flex-wrap gap-2">
+          {([
+            ["fixed", "定額（元利均等）"],
+            ["principal_equal", "元金均等"],
+            ["revolving", "リボ払い（定率）"],
+          ] as const).map(([t, label]) => (
             <button
               key={t}
               type="button"
@@ -85,10 +93,13 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
                   : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
               }`}
             >
-              {t === "fixed" ? "定額（元利均等）" : "リボ払い（定率）"}
+              {label}
             </button>
           ))}
         </div>
+        {form.repayType === "principal_equal" && (
+          <p className="mt-1.5 text-xs text-slate-500">毎月同額の元金を返済。利息は残高に応じて変動するため、月々の支払いは徐々に減ります。</p>
+        )}
       </Row>
       <div className="grid gap-5 sm:grid-cols-2">
         <Row label="当初借入額（円）" required>
@@ -125,24 +136,27 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
               {form.revolvingMin != null && form.revolvingMin > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.revolvingMin)}</span>}
             </Row>
           </>
+        ) : form.repayType === "principal_equal" ? (
+          <Row label="毎月の元金返済額（円）" required>
+            <input type="number" min={0} className={input} value={form.principalPerMonth || ""} onChange={(e) => set("principalPerMonth", Number(e.target.value))} required placeholder="例：50000" />
+            {(form.principalPerMonth ?? 0) > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.principalPerMonth!)} ＋ 利息（変動）</span>}
+            <div className="mt-2 flex items-center gap-2">
+              <input type="number" min={1} placeholder="期間（ヶ月）" className={`${input} w-32`} value={termMonths || ""} onChange={(e) => setTermMonths(Number(e.target.value))} />
+              <button type="button" onClick={() => {
+                const balance = form.currentBalance > 0 ? form.currentBalance : form.principal;
+                if (balance > 0 && termMonths > 0) set("principalPerMonth", Math.ceil(balance / termMonths));
+              }} className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50">
+                自動計算
+              </button>
+            </div>
+          </Row>
         ) : (
           <Row label="月次返済額（円）" required>
             <input type="number" min={0} className={input} value={form.monthlyPayment || ""} onChange={(e) => set("monthlyPayment", Number(e.target.value))} required />
             {form.monthlyPayment > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.monthlyPayment)}</span>}
             <div className="mt-2 flex items-center gap-2">
-              <input
-                type="number"
-                min={1}
-                placeholder="期間（ヶ月）"
-                className={`${input} w-32`}
-                value={termMonths || ""}
-                onChange={(e) => setTermMonths(Number(e.target.value))}
-              />
-              <button
-                type="button"
-                onClick={calcMonthlyPayment}
-                className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50"
-              >
+              <input type="number" min={1} placeholder="期間（ヶ月）" className={`${input} w-32`} value={termMonths || ""} onChange={(e) => setTermMonths(Number(e.target.value))} />
+              <button type="button" onClick={calcMonthlyPayment} className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50">
                 自動計算
               </button>
             </div>
@@ -155,6 +169,48 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
           <input type="number" min={1} max={31} className={input} value={form.paymentDay} onChange={(e) => set("paymentDay", Number(e.target.value))} />
         </Row>
       </div>
+      {form.repayType !== "revolving" && (
+        <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded accent-indigo-600"
+              checked={(form.bonusMonths?.length ?? 0) > 0}
+              onChange={(e) => set("bonusMonths", e.target.checked ? [6, 12] : [])}
+            />
+            ボーナス払いあり
+          </label>
+          {(form.bonusMonths?.length ?? 0) > 0 && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <Row label="ボーナス追加払い（円）">
+                <input type="number" min={0} className={input} value={form.bonusPayment || ""} onChange={(e) => set("bonusPayment", Number(e.target.value))} placeholder="例：100000" />
+                {(form.bonusPayment ?? 0) > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.bonusPayment!)}</span>}
+              </Row>
+              <Row label="ボーナス月">
+                <div className="flex flex-wrap gap-1.5">
+                  {[1,2,3,4,5,6,7,8,9,10,11,12].map((m) => {
+                    const checked = (form.bonusMonths ?? []).includes(m);
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => {
+                          const cur = form.bonusMonths ?? [];
+                          set("bonusMonths", checked ? cur.filter((x) => x !== m) : [...cur, m].sort((a, b) => a - b));
+                        }}
+                        className={`h-8 w-8 rounded-lg text-xs font-medium transition ${checked ? "bg-indigo-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
+                      >
+                        {m}
+                      </button>
+                    );
+                  })}
+                </div>
+                <span className="mt-1 block text-xs text-slate-400">選択した月に追加払いが発生</span>
+              </Row>
+            </div>
+          )}
+        </div>
+      )}
       <Row label="識別色">
         <div className="flex flex-wrap gap-2">
           {COLORS.map((c) => (

@@ -10,6 +10,8 @@ import {
 } from "recharts";
 import PaymentRecorder from "@/components/PaymentRecorder";
 import RateChanges from "@/components/RateChanges";
+import BalanceAdjust from "@/components/BalanceAdjust";
+import ChargeRecorder from "@/components/ChargeRecorder";
 
 export default function LoanDetailPage() {
   const params = useParams<{ id: string }>();
@@ -121,7 +123,9 @@ export default function LoanDetailPage() {
       )}
 
       <PaymentRecorder loan={loan} onChange={setLoan} />
+      {loan.repayType === "revolving" && <ChargeRecorder loan={loan} onChange={setLoan} />}
       <RateChanges loan={loan} onChange={setLoan} />
+      <BalanceAdjust loan={loan} onChange={setLoan} />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         <h2 className="mb-3 font-semibold">元金・利息の内訳（最初の5年）</h2>

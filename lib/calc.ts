@@ -24,23 +24,33 @@ export function rateAt(loan: Loan, dateStr: string): number {
 export function buildSchedule(loan: Loan, maxMonths = 600): ScheduleRow[] {
   let balance = loan.currentBalance;
   const isRevolving = loan.repayType === "revolving";
+  const isPrincipalEqual = loan.repayType === "principal_equal";
   const revRate = (loan.revolvingRate ?? 1) / 100;
   const revMin = loan.revolvingMin ?? 5000;
+  const bonusMonths = loan.bonusMonths ?? [];
   const rows: ScheduleRow[] = [];
-  const base = new Date();                 // 常に現在月を起点に表示する
+  const base = new Date();
 
   for (let m = 1; m <= maxMonths && balance > 0; m++) {
     const d = new Date(base.getFullYear(), base.getMonth() + m - 1, 1);
     const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const monthNum = d.getMonth() + 1;
     const yearRate = rateAt(loan, `${ym}-${String(loan.paymentDay).padStart(2, "0")}`);
     const mRate = yearRate / 100 / 12;
     const interest = Math.max(0, Math.floor(balance * mRate));
     const needed = balance + interest;
+    const isBonus = bonusMonths.includes(monthNum);
+    const bonusExtra = isBonus ? (loan.bonusPayment ?? 0) : 0;
+
     let payment: number;
     if (isRevolving) {
       payment = Math.min(Math.max(Math.ceil(balance * revRate), revMin), needed);
+    } else if (isPrincipalEqual) {
+      const principalFixed = Math.min(loan.principalPerMonth ?? 0, balance);
+      if (principalFixed <= 0) break;
+      payment = Math.min(principalFixed + interest + bonusExtra, needed);
     } else {
-      payment = Math.min(loan.monthlyPayment, needed);
+      payment = Math.min(loan.monthlyPayment + bonusExtra, needed);
     }
     const principal = payment - interest;
     if (principal <= 0) break;
@@ -60,16 +70,14 @@ export type LoanStats = {
 
 export function calcStats(loan: Loan): LoanStats {
   const firstRate = rateAt(loan, new Date().toISOString().slice(0, 10));
-  if (loan.repayType !== "revolving") {
+  if (loan.repayType === "principal_equal") {
+    if ((loan.principalPerMonth ?? 0) <= 0 && loan.currentBalance > 0) {
+      return { monthsLeft: Infinity, finishDate: null, totalInterest: Infinity, totalPayment: Infinity, feasible: false };
+    }
+  } else if (loan.repayType !== "revolving") {
     const firstInterest = loan.currentBalance * (firstRate / 100 / 12);
     if (loan.monthlyPayment <= firstInterest && loan.currentBalance > 0) {
-      return {
-        monthsLeft: Infinity,
-        finishDate: null,
-        totalInterest: Infinity,
-        totalPayment: Infinity,
-        feasible: false,
-      };
+      return { monthsLeft: Infinity, finishDate: null, totalInterest: Infinity, totalPayment: Infinity, feasible: false };
     }
   }
   const sch = buildSchedule(loan);
@@ -112,13 +120,19 @@ export function sortRateChanges(list: RateChange[]): RateChange[] {
 }
 
 export function currentMonthPayment(loan: Loan): number {
+  const today = new Date().toISOString().slice(0, 10);
+  const rate = rateAt(loan, today);
+  const interest = Math.floor(loan.currentBalance * (rate / 100 / 12));
+  const monthNum = new Date().getMonth() + 1;
+  const bonusExtra = (loan.bonusMonths ?? []).includes(monthNum) ? (loan.bonusPayment ?? 0) : 0;
   if (loan.repayType === "revolving") {
-    const rate = rateAt(loan, new Date().toISOString().slice(0, 10));
-    const interest = Math.floor(loan.currentBalance * (rate / 100 / 12));
     const payment = Math.max(Math.ceil(loan.currentBalance * (loan.revolvingRate ?? 1) / 100), loan.revolvingMin ?? 5000);
     return Math.min(payment, loan.currentBalance + interest);
   }
-  return loan.monthlyPayment;
+  if (loan.repayType === "principal_equal") {
+    return Math.min((loan.principalPerMonth ?? 0) + interest + bonusExtra, loan.currentBalance + interest);
+  }
+  return loan.monthlyPayment + bonusExtra;
 }
 
 export function calcTotalPaid(loans: Loan[]): number {
