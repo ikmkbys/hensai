@@ -86,9 +86,14 @@ export default function LoanDetailPage() {
             ? `${fmtJPY(currentMonthPayment(loan))}（残高の${loan.revolvingRate ?? 1}%）`
             : fmtJPY(loan.monthlyPayment)}
         />
-        <Stat label="完済予定" value={stats.feasible ? (stats.finishDate ?? "—") : "要再計画"} />
+        <Stat label={loan.repayType === "revolving" ? "完済予定（参考）" : "完済予定"} value={stats.feasible ? (stats.finishDate ?? "—") : "要再計画"} />
         <Stat label="利息総額（予測）" value={fmtJPY(stats.totalInterest)} />
       </section>
+      {loan.repayType === "revolving" && (
+        <p className="text-xs text-slate-400">
+          ※ 完済予定・利息総額・スケジュールは「残高の{loan.revolvingRate ?? 1}%・最低{(loan.revolvingMin ?? 5000).toLocaleString()}円」で試算した参考値です。実際の支払い額はカード会社の規定によって異なります。
+        </p>
+      )}
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-2 flex items-center justify-between">
