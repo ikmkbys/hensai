@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { loadData } from "@/lib/storage";
-import { Loan } from "@/lib/types";
-import { buildSchedule, calcConsecutiveMonths, calcStats, calcTotalPaid, currentMonthPayment, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct } from "@/lib/calc";
+import { loadData, newId, upsertLoan } from "@/lib/storage";
+import { Loan, Payment } from "@/lib/types";
+import { buildSchedule, calcConsecutiveMonths, calcStats, calcTotalPaid, currentMonthPayment, fmtJPY, isPaidThisMonth, isPaymentDuePast, progressPct, splitPayment } from "@/lib/calc";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
@@ -12,11 +12,29 @@ import {
 export default function HomePage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [payDate, setPayDate] = useState(new Date().toISOString().slice(0, 10));
+  const [payAmount, setPayAmount] = useState(0);
 
   useEffect(() => {
     setLoans(loadData().loans);
     setMounted(true);
   }, []);
+
+  function quickRecord(loan: Loan) {
+    if (payAmount <= 0) return;
+    const { interestPart, principalPart } = splitPayment(loan, payDate, payAmount);
+    const p: Payment = { id: newId(), date: payDate, amount: payAmount, note: "", interestPart, principalPart };
+    const updated: Loan = {
+      ...loan,
+      payments: [...(loan.payments ?? []), p],
+      currentBalance: Math.max(0, loan.currentBalance - principalPart),
+      updatedAt: new Date().toISOString(),
+    };
+    upsertLoan(updated);
+    setLoans((prev) => prev.map((l) => l.id === updated.id ? updated : l));
+    setPayingId(null);
+  }
 
   const totalBalance = loans.reduce((s, l) => s + l.currentBalance, 0);
   const totalMonthly = loans.reduce((s, l) => s + currentMonthPayment(l), 0);
@@ -159,28 +177,63 @@ export default function HomePage() {
           <Link href="/loans/new" className="text-sm text-indigo-600 hover:underline">+ 新規追加</Link>
         </div>
         <div className="space-y-2">
-          {loans.map((l) => (
-            <Link
-              key={l.id}
-              href={`/loans/${l.id}`}
-              className="flex items-center gap-3 rounded-lg border border-slate-100 p-3 transition hover:border-indigo-200 hover:bg-indigo-50/30"
-            >
-              <span className="h-8 w-2 rounded-full" style={{ background: l.color }} />
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{l.name}</div>
-                <div className="text-xs text-slate-500">{l.lender}・年利 {l.annualRate}%</div>
+          {loans.map((l) => {
+            const isOpen = payingId === l.id;
+            return (
+              <div key={l.id} className="overflow-hidden rounded-lg border border-slate-100">
+                <div className="flex items-center gap-3 p-3 transition hover:bg-indigo-50/30">
+                  <Link href={`/loans/${l.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+                    <span className="h-8 w-2 flex-shrink-0 rounded-full" style={{ background: l.color }} />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{l.name}</div>
+                      <div className="text-xs text-slate-500">{l.lender}・年利 {l.annualRate}%</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold tabular-nums">{fmtJPY(l.currentBalance)}</div>
+                      <div className="text-xs text-slate-500">{progressPct(l).toFixed(0)}% 完了</div>
+                    </div>
+                  </Link>
+                  {l.currentBalance > 0 && (
+                    <button
+                      onClick={() => {
+                        if (isOpen) { setPayingId(null); return; }
+                        setPayingId(l.id);
+                        setPayAmount(currentMonthPayment(l));
+                        setPayDate(new Date().toISOString().slice(0, 10));
+                      }}
+                      className={`ml-1 rounded-lg px-3 py-1.5 text-xs font-medium transition ${isOpen ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}
+                    >
+                      {isOpen ? "×" : "記録"}
+                    </button>
+                  )}
+                </div>
+                {isOpen && (
+                  <div className="border-t border-slate-100 bg-slate-50 px-3 py-3">
+                    <div className="flex flex-wrap items-end gap-2">
+                      <label className="block text-xs">
+                        <span className="mb-1 block font-medium text-slate-600">日付</span>
+                        <input type="date" value={payDate} onChange={(e) => setPayDate(e.target.value)} className={miniInput} />
+                      </label>
+                      <label className="block text-xs">
+                        <span className="mb-1 block font-medium text-slate-600">金額（円）</span>
+                        <input type="number" min={0} value={payAmount || ""} onChange={(e) => setPayAmount(Number(e.target.value))} className={miniInput} />
+                      </label>
+                      <button onClick={() => quickRecord(l)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-700">
+                        記録する
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-right">
-                <div className="font-semibold tabular-nums">{fmtJPY(l.currentBalance)}</div>
-                <div className="text-xs text-slate-500">{progressPct(l).toFixed(0)}% 完了</div>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>
   );
 }
+
+const miniInput = "rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
 
 function Stat({ label, value, tone }: { label: string; value: string; tone: "indigo" | "slate" | "emerald" }) {
   const bg = { indigo: "bg-indigo-600", slate: "bg-slate-700", emerald: "bg-emerald-600" }[tone];
