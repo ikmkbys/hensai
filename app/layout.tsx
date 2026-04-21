@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "HENSAI — 前向きにクリア",
   description: "借入の一元管理・返済計画アプリ。ローカル保存のみ、アカウント不要。",
+  openGraph: {
+    title: "HENSAI — 前向きにクリア",
+    description: "借入の一元管理・返済計画アプリ。ローカル保存のみ、アカウント不要。",
+    url: "https://hensai.stellars-lab.com",
+    siteName: "HENSAI",
+    type: "website",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HENSAI — 前向きにクリア",
+    description: "借入の一元管理・返済計画アプリ。ローカル保存のみ、アカウント不要。",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
