@@ -8,10 +8,12 @@ import { buildSchedule, calcStats, currentMonthPayment, fmtJPY, isPaidThisMonth,
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from "recharts";
+import { PartyPopper, Trophy } from "lucide-react";
 import PaymentRecorder from "@/components/PaymentRecorder";
 import RateChanges from "@/components/RateChanges";
 import BalanceAdjust from "@/components/BalanceAdjust";
 import ChargeRecorder from "@/components/ChargeRecorder";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function LoanDetailPage() {
   const params = useParams<{ id: string }>();
@@ -19,6 +21,7 @@ export default function LoanDetailPage() {
   const [loan, setLoan] = useState<Loan | null | undefined>(undefined);
   const [editing, setEditing] = useState(false);
   const [showAllSchedule, setShowAllSchedule] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     setLoan(getLoan(params.id) ?? null);
@@ -28,8 +31,8 @@ export default function LoanDetailPage() {
   if (loan === null) return <div className="text-slate-500">見つかりませんでした。</div>;
 
   const stats = calcStats(loan);
-  const schedule = buildSchedule(loan).slice(0, 60);
-  const chartData = schedule.map((r) => ({ date: r.date, 元金: r.principal, 利息: r.interest }));
+  const schedule = buildSchedule(loan);
+  const chartData = schedule.slice(0, 60).map((r) => ({ date: r.date, 元金: r.principal, 利息: r.interest }));
   const pct = progressPct(loan);
   const reachedMilestones = [25, 50, 75].filter((m) => pct >= m);
   const totalLoanPaid = (loan.payments ?? []).reduce((s, p) => s + p.amount, 0);
@@ -45,12 +48,14 @@ export default function LoanDetailPage() {
           initial={loan}
           submitLabel="更新する"
           onSubmit={(l) => { upsertLoan(l); setLoan(l); setEditing(false); }}
-          onDelete={() => {
-            if (confirm(`「${loan.name}」を削除しますか？`)) {
-              deleteLoan(loan.id);
-              router.push("/loans");
-            }
-          }}
+          onDelete={() => setConfirmDelete(true)}
+        />
+        <ConfirmDialog
+          open={confirmDelete}
+          title={`「${loan.name}」を削除しますか？`}
+          message="この借入の返済履歴・金利変更履歴もすべて削除されます。この操作は取り消せません。"
+          onConfirm={() => { deleteLoan(loan.id); router.push("/loans"); }}
+          onCancel={() => setConfirmDelete(false)}
         />
       </div>
     );
@@ -60,7 +65,7 @@ export default function LoanDetailPage() {
     <div className="space-y-6">
       {loan.currentBalance === 0 && loan.principal > 0 && (
         <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-          <div className="mb-2 text-4xl">🎉</div>
+          <div className="mb-2 flex justify-center"><PartyPopper className="h-10 w-10 text-emerald-600" /></div>
           <h2 className="text-xl font-bold text-emerald-800">完済おめでとうございます！</h2>
           <p className="mt-2 text-sm text-emerald-700">
             累計返済額 {fmtJPY(totalLoanPaid)}・{loan.payments?.length ?? 0} 回の返済で達成
@@ -108,7 +113,7 @@ export default function LoanDetailPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             {reachedMilestones.map((m) => (
               <span key={m} className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700">
-                🎯 {m}% 達成
+                <Trophy className="inline h-3 w-3 mr-1 align-text-bottom" />{m}% 達成
               </span>
             ))}
           </div>
@@ -117,7 +122,9 @@ export default function LoanDetailPage() {
 
       {!stats.feasible && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          月次返済額が利息を下回っているため、このままでは完済できません。返済額を増やすか、金利の見直しが必要です。
+          {loan.repayType === "revolving"
+            ? "毎月の支払いが利息をまかなえないため、このままでは残高が減りません。支払い率・最低支払額の見直しが必要です。"
+            : "月次返済額が利息を下回っているため、このままでは完済できません。返済額を増やすか、金利の見直しが必要です。"}
         </div>
       )}
 
@@ -164,7 +171,7 @@ export default function LoanDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {schedule.slice(0, showAllSchedule ? 24 : 12).map((r) => (
+              {(showAllSchedule ? schedule : schedule.slice(0, 12)).map((r) => (
                 <tr key={r.month} className="border-t border-slate-100 tabular-nums">
                   <td className="py-1.5 pr-4">{r.month}</td>
                   <td className="py-1.5 pr-4">{r.date}</td>
@@ -182,7 +189,7 @@ export default function LoanDetailPage() {
             onClick={() => setShowAllSchedule((v) => !v)}
             className="mt-3 text-sm text-indigo-600 hover:underline"
           >
-            {showAllSchedule ? "折りたたむ" : `もっと見る（全${Math.min(schedule.length, 24)}回）`}
+            {showAllSchedule ? "折りたたむ" : `すべて表示（全${schedule.length}回）`}
           </button>
         )}
       </section>

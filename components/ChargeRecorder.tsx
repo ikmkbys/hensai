@@ -3,12 +3,14 @@ import { useState } from "react";
 import { Charge, Loan } from "@/lib/types";
 import { newId, upsertLoan } from "@/lib/storage";
 import { fmtJPY } from "@/lib/calc";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChange: (l: Loan) => void }) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState("");
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   function add() {
     if (amount <= 0) return;
@@ -27,7 +29,6 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
   }
 
   function remove(id: string) {
-    if (!confirm("この利用記録を削除しますか？残高も元に戻ります。")) return;
     const charge = (loan.charges ?? []).find((c) => c.id === id);
     if (!charge) return;
     const updated: Loan = {
@@ -41,9 +42,17 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
   }
 
   const list = [...(loan.charges ?? [])].sort((a, b) => b.date.localeCompare(a.date));
+  const confirmTarget = confirmId ? (loan.charges ?? []).find((c) => c.id === confirmId) : undefined;
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <ConfirmDialog
+        open={!!confirmTarget}
+        title="利用記録を削除しますか？"
+        message={confirmTarget ? `${confirmTarget.date} の +${fmtJPY(confirmTarget.amount)} を削除します。加算した残高は元に戻ります。` : ""}
+        onConfirm={() => { if (confirmTarget) remove(confirmTarget.id); setConfirmId(null); }}
+        onCancel={() => setConfirmId(null)}
+      />
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-semibold">利用額の追加</h2>
         <button
@@ -97,7 +106,7 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
                 <td className="py-1.5 pr-4 text-right text-red-600">+{fmtJPY(c.amount)}</td>
                 <td className="py-1.5 pr-4 text-slate-500">{c.note}</td>
                 <td className="py-1.5 text-right">
-                  <button onClick={() => remove(c.id)} className="text-xs text-red-600 hover:underline">削除</button>
+                  <button onClick={() => setConfirmId(c.id)} className="text-xs text-red-600 hover:underline">削除</button>
                 </td>
               </tr>
             ))}

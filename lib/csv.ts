@@ -104,7 +104,7 @@ function splitRows(csv: string): string[] {
 }
 
 export function fromCSV(csv: string): Loan[] {
-  const lines = splitRows(csv);
+  const lines = splitRows(csv.replace(/^﻿/, "")); // Excel等が付けるBOMを除去
   if (lines.length < 2) return [];
   const header = parseCSVLine(lines[0]);
   const loans: Loan[] = [];
@@ -112,6 +112,7 @@ export function fromCSV(csv: string): Loan[] {
     const cols = parseCSVLine(lines[i]);
     const obj: Record<string, string> = {};
     header.forEach((h, j) => (obj[h] = cols[j] ?? ""));
+    if (!obj.id) continue; // id欠落行は不正データとしてスキップ（空idのままマージすると衝突する）
     loans.push({
       id: obj.id,
       name: obj.name,
@@ -141,7 +142,7 @@ export function fromCSV(csv: string): Loan[] {
 }
 
 export function downloadCSV(filename: string, csv: string) {
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }); // BOM付きでExcelの文字化けを防ぐ
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

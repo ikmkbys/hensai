@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Loan, Payment } from "@/lib/types";
 import { fmtJPY, splitPayment } from "@/lib/calc";
 import { newId, upsertLoan } from "@/lib/storage";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChange: (l: Loan) => void }) {
   const today = new Date().toISOString().slice(0, 10);
@@ -10,6 +11,7 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
   const [date, setDate] = useState(today);
   const [amount, setAmount] = useState<number>(loan.monthlyPayment);
   const [note, setNote] = useState("");
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   function record() {
     if (amount <= 0) return;
@@ -32,7 +34,6 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
   function remove(id: string) {
     const target = loan.payments.find((p) => p.id === id);
     if (!target) return;
-    if (!confirm(`${target.date} の ${fmtJPY(target.amount)} を取り消しますか？（残高が戻ります）`)) return;
     // 旧データ（principalPart未保存）は amount 全額を元金として扱っていたため、そのぶん戻す
     const restorePrincipal = target.principalPart ?? target.amount;
     const updated: Loan = {
@@ -46,9 +47,18 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
   }
 
   const history = [...(loan.payments ?? [])].sort((a, b) => b.date.localeCompare(a.date));
+  const confirmTarget = confirmId ? (loan.payments ?? []).find((p) => p.id === confirmId) : undefined;
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <ConfirmDialog
+        open={!!confirmTarget}
+        title="返済記録を取り消しますか？"
+        message={confirmTarget ? `${confirmTarget.date} の ${fmtJPY(confirmTarget.amount)} を取り消します。減算した残高は元に戻ります。` : ""}
+        confirmLabel="取り消す"
+        onConfirm={() => { if (confirmTarget) remove(confirmTarget.id); setConfirmId(null); }}
+        onCancel={() => setConfirmId(null)}
+      />
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-semibold">返済履歴</h2>
         <button
@@ -105,7 +115,7 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
                   <td className="py-1.5 pr-4 text-right text-slate-500">{p.interestPart != null ? fmtJPY(p.interestPart) : "—"}</td>
                   <td className="py-1.5 pr-4 text-slate-600">{p.note}</td>
                   <td className="py-1.5 text-right">
-                    <button onClick={() => remove(p.id)} className="text-xs text-red-600 hover:underline">取消</button>
+                    <button onClick={() => setConfirmId(p.id)} className="text-xs text-red-600 hover:underline">取消</button>
                   </td>
                 </tr>
               ))}

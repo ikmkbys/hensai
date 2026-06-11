@@ -29,9 +29,8 @@ export default function SimulatorPage() {
     const simLoan: Loan = {
       ...loan,
       currentBalance: Math.max(0, loan.currentBalance - lump),
-      monthlyPayment: loan.monthlyPayment + extra,
     };
-    const simSch = buildSchedule(simLoan);
+    const simSch = buildSchedule(simLoan, 600, extra); // extraMonthly経由なら元金均等・リボにも追加返済が効く
     return { base: baseSch, sim: simSch };
   }, [loan, extra, lump]);
 
@@ -55,7 +54,7 @@ export default function SimulatorPage() {
   }
 
   const baseStats = loan ? calcStats(loan) : null;
-  const simStats = loan ? calcStats({ ...loan, currentBalance: Math.max(0, loan.currentBalance - lump), monthlyPayment: loan.monthlyPayment + extra }) : null;
+  const simStats = loan ? calcStats({ ...loan, currentBalance: Math.max(0, loan.currentBalance - lump) }, extra) : null;
 
   const savedInterest = baseStats && simStats && baseStats.feasible && simStats.feasible
     ? baseStats.totalInterest - simStats.totalInterest : 0;

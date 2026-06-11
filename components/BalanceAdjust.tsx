@@ -11,7 +11,15 @@ export default function BalanceAdjust({ loan, onChange }: { loan: Loan; onChange
 
   function save() {
     if (balance < 0) return;
-    const updated: Loan = { ...loan, currentBalance: balance, updatedAt: new Date().toISOString() };
+    const trimmed = note.trim();
+    const stamp = new Date().toISOString().slice(0, 10);
+    const adjLine = trimmed ? `[${stamp} 残高修正 ${fmtJPY(loan.currentBalance)}→${fmtJPY(balance)}] ${trimmed}` : "";
+    const updated: Loan = {
+      ...loan,
+      currentBalance: balance,
+      note: adjLine ? (loan.note ? `${loan.note}\n${adjLine}` : adjLine) : loan.note, // メモ入力時は借入メモ欄に履歴として追記
+      updatedAt: new Date().toISOString(),
+    };
     upsertLoan(updated);
     onChange(updated);
     setOpen(false);
@@ -54,6 +62,7 @@ export default function BalanceAdjust({ loan, onChange }: { loan: Loan; onChange
           <label className="block text-sm">
             <span className="mb-1 block font-medium">メモ（任意）</span>
             <input type="text" className={input} value={note} onChange={(e) => setNote(e.target.value)} placeholder="例：2026年4月残高証明書に合わせて修正" />
+            <span className="mt-1 block text-xs text-slate-400">入力すると借入のメモ欄に履歴として追記されます</span>
           </label>
           <button onClick={save} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
             修正を確定する

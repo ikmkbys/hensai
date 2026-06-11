@@ -28,7 +28,11 @@ export function loadData(): AppData {
 
 export function saveData(data: AppData) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch {
+    alert("データの保存に失敗しました。ブラウザの空き容量不足、またはプライベートブラウズが原因の可能性があります。"); // localStorageが唯一の保存先のため失敗は必ず知らせる
+  }
 }
 
 export function upsertLoan(loan: Loan) {

@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Loan, RateChange } from "@/lib/types";
 import { newId, upsertLoan } from "@/lib/storage";
 import { fmtJPY, rateAt, sortRateChanges } from "@/lib/calc";
+import { TrendingDown } from "lucide-react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: (l: Loan) => void }) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [rate, setRate] = useState<number>(loan.annualRate);
   const [savingsFeedback, setSavingsFeedback] = useState<{ monthly: number; prevRate: number; newRate: number } | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   function add() {
     if (!date || rate < 0) return;
@@ -31,7 +34,6 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
   }
 
   function remove(id: string) {
-    if (!confirm("この金利変更を削除しますか？")) return;
     const updated: Loan = {
       ...loan,
       rateChanges: loan.rateChanges.filter((r) => r.id !== id),
@@ -42,9 +44,17 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
   }
 
   const list = sortRateChanges(loan.rateChanges ?? []);
+  const confirmTarget = confirmId ? (loan.rateChanges ?? []).find((r) => r.id === confirmId) : undefined;
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <ConfirmDialog
+        open={!!confirmTarget}
+        title="金利変更を削除しますか？"
+        message={confirmTarget ? `${confirmTarget.date} 適用の ${confirmTarget.annualRate}% を削除します。以降のスケジュール計算から除外されます。` : ""}
+        onConfirm={() => { if (confirmTarget) remove(confirmTarget.id); setConfirmId(null); }}
+        onCancel={() => setConfirmId(null)}
+      />
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-semibold">金利変更履歴</h2>
         <button
@@ -76,7 +86,7 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
 
       {savingsFeedback && (
         <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-          🎉 金利が {savingsFeedback.prevRate}% → {savingsFeedback.newRate}% に下がりました！
+          <TrendingDown className="inline h-4 w-4 mr-1 align-text-bottom" />金利が {savingsFeedback.prevRate}% → {savingsFeedback.newRate}% に下がりました！
           月々の利息負担が約 {fmtJPY(savingsFeedback.monthly)} 軽減されます。
         </div>
       )}
@@ -97,7 +107,7 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
                 <td className="py-1.5 pr-4">{r.date}</td>
                 <td className="py-1.5 pr-4 text-right font-medium">{r.annualRate}%</td>
                 <td className="py-1.5 text-right">
-                  <button onClick={() => remove(r.id)} className="text-xs text-red-600 hover:underline">削除</button>
+                  <button onClick={() => setConfirmId(r.id)} className="text-xs text-red-600 hover:underline">削除</button>
                 </td>
               </tr>
             ))}

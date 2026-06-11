@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { loadData } from "@/lib/storage";
 import { Loan } from "@/lib/types";
-import { calcStats, fmtJPY, progressPct } from "@/lib/calc";
+import { calcStats, currentMonthPayment, fmtJPY, progressPct } from "@/lib/calc";
 
 export default function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -52,7 +52,7 @@ export default function LoansPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <Info label="年利" value={`${l.annualRate}%`} />
-                  <Info label="月々" value={fmtJPY(l.monthlyPayment)} />
+                  <Info label="月々" value={fmtJPY(currentMonthPayment(l))} />
                   <Info label="完済" value={s.feasible ? (s.finishDate ?? "—") : "要再計画"} />
                 </div>
               </Link>
