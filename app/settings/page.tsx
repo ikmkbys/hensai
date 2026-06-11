@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { loadData, saveData } from "@/lib/storage";
 import { downloadCSV, fromCSV, toCSV } from "@/lib/csv";
 import { Loan } from "@/lib/types";
+import { Trash2, AlertTriangle } from "lucide-react";
 
 export default function SettingsPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -60,13 +61,13 @@ export default function SettingsPage() {
       {showResetDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <div className="mb-1 text-2xl">🗑️</div>
+            <div className="mb-1"><Trash2 className="h-6 w-6 text-red-500" /></div>
             <h2 className="mb-2 text-lg font-bold">全データを削除しますか？</h2>
             <p className="mb-4 text-sm text-slate-600">
               借入情報・返済履歴・金利変更履歴を含む<strong>すべてのデータが完全に削除</strong>されます。この操作は取り消せません。
             </p>
             <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              ⚠️ 削除前にCSVエクスポートでバックアップを取っておくことをおすすめします。
+              <AlertTriangle className="inline h-4 w-4 mr-1 align-text-bottom" />削除前にCSVエクスポートでバックアップを取っておくことをおすすめします。
             </div>
             <div className="flex flex-col gap-2">
               <button

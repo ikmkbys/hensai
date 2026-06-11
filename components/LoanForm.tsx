@@ -36,6 +36,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
     revolvingRate: initial?.revolvingRate ?? 1,
     revolvingMin: initial?.revolvingMin ?? 5000,
     charges: initial?.charges ?? [],
+    gracePeriodMonths: initial?.gracePeriodMonths ?? 0,
     startDate: initial?.startDate ?? today,
     paymentDay: initial?.paymentDay ?? 27,
     color: initial?.color ?? firstUnusedColor(usedColors),
@@ -107,6 +108,14 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
           <p className="mt-1.5 text-xs text-slate-500">残高に対して一定の率で返済。残高が減ると支払額も減りますが、利息が多く元金が減りにくい点に注意。</p>
         )}
       </Row>
+      {form.repayType !== "revolving" && (
+        <Row label="据置期間（ヶ月）">
+          <input type="number" min={0} className={input} value={form.gracePeriodMonths || ""} onChange={(e) => set("gracePeriodMonths", Number(e.target.value))} placeholder="0 = なし" />
+          {(form.gracePeriodMonths ?? 0) > 0 && (
+            <span className="mt-1 block text-xs text-slate-500">開始から {form.gracePeriodMonths} ヶ月間は利息のみ支払い、元金は変わりません。</span>
+          )}
+        </Row>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <Row label="当初借入額（円）" required>
           <input type="number" min={0} className={input} value={form.principal || ""} onChange={(e) => set("principal", Number(e.target.value))} required />

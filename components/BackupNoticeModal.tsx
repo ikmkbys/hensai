@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { HardDrive } from "lucide-react";
 
 const SHOWN_KEY = "hensai.backup-notice-v1";
 
@@ -29,7 +30,7 @@ export default function BackupNoticeModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        <div className="mb-1 text-2xl">💾</div>
+        <div className="mb-1"><HardDrive className="h-6 w-6 text-indigo-600" /></div>
         <h2 className="mb-2 text-lg font-bold">データの保管について</h2>
         <p className="mb-4 text-sm text-slate-600">
           HENSAIのデータはサーバーに送信されず、<strong>このブラウザにのみ保存</strong>されます。

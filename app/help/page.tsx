@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BookOpen, FileText, CreditCard, BarChart2, Calculator, LayoutDashboard, HelpCircle, HardDrive, Lightbulb, AlertTriangle, Flame } from "lucide-react";
 
 export default function HelpPage() {
   return (
@@ -6,7 +7,7 @@ export default function HelpPage() {
 
       {/* Hero */}
       <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-6 text-center">
-        <div className="mb-3 text-4xl">📚</div>
+        <div className="mb-3 flex justify-center"><BookOpen className="h-10 w-10 text-indigo-600" /></div>
         <h1 className="text-2xl font-bold">HENSAI の使い方</h1>
         <p className="mt-2 text-slate-600">借入を登録して、返済を記録するだけ。完済への道を一緒に歩もう。</p>
       </div>
@@ -29,7 +30,7 @@ export default function HelpPage() {
       </Section>
 
       {/* 借入登録 */}
-      <Section title="📝 借入登録">
+      <Section title="借入登録" icon={<FileText className="h-5 w-5" />}>
         <div className="space-y-3">
           <FieldRow label="当初借入額" desc="最初に借りた金額。住宅ローンなら契約時の借入額を入力します。進捗（返済率）の計算に使われます。" />
           <FieldRow label="現在残高" desc="いま実際に残っている借入金額。残高証明書や銀行アプリで確認できます。当初借入額より大きい値は入力できません。" />
@@ -39,12 +40,12 @@ export default function HelpPage() {
           <FieldRow label="識別色" desc="複数の借入を色分けして管理できます。新規登録時は未使用の色が自動で選ばれます。" />
         </div>
         <Callout>
-          💡 <b>月次返済額の自動計算</b>：「月次返済額」の下にある入力欄に返済期間（ヶ月数）を入れて「自動計算」を押すと、元利均等返済の月額が自動で入ります。例：35年 → 420ヶ月。
+          <Lightbulb className="inline h-4 w-4 mr-1 align-text-bottom" /><b>月次返済額の自動計算</b>：「月次返済額」の下にある入力欄に返済期間（ヶ月数）を入れて「自動計算」を押すと、元利均等返済の月額が自動で入ります。例：35年 → 420ヶ月。
         </Callout>
       </Section>
 
       {/* 返済記録 */}
-      <Section title="💳 返済記録">
+      <Section title="返済記録" icon={<CreditCard className="h-5 w-5" />}>
         <p className="text-sm text-slate-700">
           借入詳細ページの「今月の返済を記録」から、日付・金額・メモを入力して記録します。
         </p>
@@ -62,18 +63,18 @@ export default function HelpPage() {
       </Section>
 
       {/* 金利変更 */}
-      <Section title="📊 金利変更">
+      <Section title="金利変更" icon={<BarChart2 className="h-5 w-5" />}>
         <p className="text-sm text-slate-700">
           変動金利のローンは、金利が変わったタイミングで「金利変更を追加」から登録します。
           適用開始日以降のスケジュール計算に新しい金利が使われます。
         </p>
         <Callout>
-          💡 金利が下がった場合、登録すると月々の利息削減額がお知らせされます。
+          <Lightbulb className="inline h-4 w-4 mr-1 align-text-bottom" />金利が下がった場合、登録すると月々の利息削減額がお知らせされます。
         </Callout>
       </Section>
 
       {/* シミュレーター */}
-      <Section title="🔮 シミュレーター">
+      <Section title="シミュレーター" icon={<Calculator className="h-5 w-5" />}>
         <p className="text-sm text-slate-700">
           「もし毎月の返済を増やしたら？」「一括で繰り上げ返済したら？」の効果を試算できます。
         </p>
@@ -85,19 +86,19 @@ export default function HelpPage() {
       </Section>
 
       {/* ホーム画面の見方 */}
-      <Section title="🏠 ホーム画面の見方">
+      <Section title="ホーム画面の見方" icon={<LayoutDashboard className="h-5 w-5" />}>
         <div className="space-y-2">
           <Item title="総残高">全借入の現在残高合計。</Item>
           <Item title="月次返済合計">全借入の月々返済額の合計。毎月これだけ用意する必要があります。</Item>
           <Item title="完済予定">最も遅く終わる借入の完済月。全借入が終わる目標日です。</Item>
           <Item title="全体の進捗バー">「返済済み ÷ 当初合計」で計算。25/50/75% に達するとバッジが表示されます。</Item>
           <Item title="累計返済額">これまでに記録した返済金額の合計（元金＋利息）。</Item>
-          <Item title="連続返済 🔥">連続して返済を記録している月数。途切れるとリセットされます。</Item>
+          <Item title="連続返済"><Flame className="inline h-3.5 w-3.5 mr-0.5 text-orange-500 align-text-bottom" />連続して返済を記録している月数。途切れるとリセットされます。</Item>
         </div>
       </Section>
 
       {/* データ管理 */}
-      <Section title="💾 データのバックアップ">
+      <Section title="データのバックアップ" icon={<HardDrive className="h-5 w-5" />}>
         <p className="text-sm text-slate-700">
           HENSAIのデータはサーバーに送信されず、<strong>このブラウザにのみ保存</strong>されています。プライバシーに配慮した設計ですが、ブラウザの設定変更や端末の切り替えによってデータが失われることがあります。
         </p>
@@ -132,12 +133,12 @@ export default function HelpPage() {
           <Item title="CSV インポート">ブラウザ変更・端末変更時は、エクスポートしたCSVを「設定」→「CSVインポート」で読み込むとデータを完全に復元できます。</Item>
         </div>
         <Callout type="warn">
-          ⚠️ データの紛失については責任を負いかねます。大切なデータを守るため、定期的なCSVエクスポートをお願いします。
+          <AlertTriangle className="inline h-4 w-4 mr-1 align-text-bottom" />データの紛失については責任を負いかねます。大切なデータを守るため、定期的なCSVエクスポートをお願いします。
         </Callout>
       </Section>
 
       {/* FAQ */}
-      <Section title="❓ よくある質問">
+      <Section title="よくある質問" icon={<HelpCircle className="h-5 w-5" />}>
         <div className="space-y-4">
           <Faq q="登録できる借入の件数に上限はありますか？">
             上限はありません。住宅ローン・車のローン・カードローンなど、複数まとめて管理できます。
@@ -149,10 +150,10 @@ export default function HelpPage() {
             元利均等返済方式（毎月一定額を返済）で計算しています。金利変更がある場合はその月から新しい金利で再計算します。
           </Faq>
           <Faq q="残高が「0」になったらどうなりますか？">
-            完済おめでとうセクションが表示されます 🎉 記録はそのまま残ります。
+            完済おめでとうセクションが表示されます。記録はそのまま残ります。
           </Faq>
           <Faq q="スマホでも使えますか？">
-            ブラウザから <strong>hensai.stellars-lab.com</strong> にアクセスするとスマホでも利用できます。ホーム画面に追加すると、アプリのように使えます。
+            ブラウザから <strong>hensai.stellars-lab.com</strong> にアクセスするとスマホでも利用できます。ホーム画面に追加すると、アプリのように使えます。ただし、データはブラウザごとに保存されるため、PCとスマホ間での自動同期はできません。端末を切り替える場合は「設定」からCSVでデータを移してください。
           </Faq>
         </div>
       </Section>
@@ -161,10 +162,13 @@ export default function HelpPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="mb-4 text-lg font-bold text-slate-800">{title}</h2>
+      <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-800">
+        {icon && <span className="text-indigo-600">{icon}</span>}
+        {title}
+      </h2>
       {children}
     </section>
   );

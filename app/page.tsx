@@ -9,6 +9,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
 import BackupNoticeModal from "@/components/BackupNoticeModal";
+import { Target, Flame, HardDrive } from "lucide-react";
 
 export default function HomePage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -82,7 +83,7 @@ export default function HomePage() {
         <BackupNoticeModal />
         <div className="grid place-items-center py-16 text-center">
         <div className="max-w-md">
-          <div className="mb-6 text-6xl">🎯</div>
+          <div className="mb-6 flex justify-center"><Target className="h-14 w-14 text-indigo-600" /></div>
           <h1 className="mb-3 text-2xl font-bold">前向きに、クリアしていこう</h1>
           <p className="mb-8 text-slate-600">
             借入を登録すると、残高・返済予定・完済日が一目でわかります。<br />
@@ -139,7 +140,7 @@ export default function HomePage() {
           {consecutiveMonths > 0 && (
             <div>
               <div className="text-xs text-slate-500">連続返済</div>
-              <div className="mt-0.5 font-semibold tabular-nums">{consecutiveMonths}ヶ月継続中 🔥</div>
+              <div className="mt-0.5 font-semibold tabular-nums flex items-center gap-1">{consecutiveMonths}ヶ月継続中 <Flame className="h-4 w-4 text-orange-500" /></div>
             </div>
           )}
         </div>
@@ -199,17 +200,22 @@ export default function HomePage() {
                     </div>
                   </Link>
                   {l.currentBalance > 0 && (
-                    <button
-                      onClick={() => {
-                        if (isOpen) { setPayingId(null); return; }
-                        setPayingId(l.id);
-                        setPayAmount(currentMonthPayment(l));
-                        setPayDate(new Date().toISOString().slice(0, 10));
-                      }}
-                      className={`ml-1 rounded-lg px-3 py-1.5 text-xs font-medium transition ${isOpen ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}
-                    >
-                      {isOpen ? "×" : "記録"}
-                    </button>
+                    <div className="ml-1 flex items-center gap-1.5">
+                      {isPaidThisMonth(l) && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">済</span>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (isOpen) { setPayingId(null); return; }
+                          setPayingId(l.id);
+                          setPayAmount(currentMonthPayment(l));
+                          setPayDate(new Date().toISOString().slice(0, 10));
+                        }}
+                        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${isOpen ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}
+                      >
+                        {isOpen ? "×" : "記録"}
+                      </button>
+                    </div>
                   )}
                 </div>
                 {isOpen && (
@@ -234,10 +240,15 @@ export default function HomePage() {
           })}
         </div>
       </section>
-      <p className="text-center text-xs text-slate-400">
-        💾 データはこの端末のブラウザにのみ保存されます。{" "}
-        <Link href="/settings" className="underline hover:text-slate-600">定期的なCSVバックアップ</Link>をおすすめします。
-      </p>
+      <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 text-center">
+        <p className="text-sm font-medium text-slate-700">
+          <HardDrive className="inline h-4 w-4 mr-1 align-text-bottom text-slate-500" />データはこの端末のブラウザにのみ保存されます。
+        </p>
+        <p className="mt-1 text-sm text-slate-500">
+          端末・ブラウザを変えるとデータは引き継がれません。{" "}
+          <Link href="/settings" className="text-indigo-600 underline hover:text-indigo-700">定期的なCSVバックアップ</Link>をおすすめします。
+        </p>
+      </div>
     </div>
   );
 }

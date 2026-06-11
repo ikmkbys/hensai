@@ -35,6 +35,7 @@ export type Loan = {
   revolvingRate?: number;      // リボ：毎月支払い率（%）例：1.0
   revolvingMin?: number;       // リボ：最低支払額（円）例：5000
   charges?: Charge[];          // リボ：残高増加記録
+  gracePeriodMonths?: number;  // 据置期間（ヶ月）：利息のみ支払う期間
   startDate: string;
   paymentDay: number;
   color: string;
