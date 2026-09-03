@@ -97,6 +97,71 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+
+      <section className="mx-auto max-w-2xl space-y-8 border-t border-slate-200 pt-10 text-slate-600">
+        <div>
+          <h2 className="mb-3 text-lg font-bold text-slate-900">HENSAI にできること</h2>
+          <p className="text-sm leading-7">
+            奉学金、自動車ローン、カードのリボ払い。
+            それぞれの残高は明細を見れば分かるのに、合計でいつ終わるのかだけが分からない。
+            HENSAI は複数の借入をまとめて登録し、完済までの道筋を一本の線として見せるための道具です。
+            元利均等・元金均等・リボ払い（定率）の三方式に対応していて、
+            毎月いくら上乗せすると完済が何ヶ月縮むのかもその場で試せます。
+          </p>
+        </div>
+
+        <div>
+          <h2 className="mb-3 text-lg font-bold text-slate-900">返済方式で、総額は変わる</h2>
+          <dl className="space-y-4 text-sm leading-7">
+            <div>
+              <dt className="font-semibold text-slate-800">元利均等返済</dt>
+              <dd>
+                毎月払う額（元金＋利息）が一定になる方式。家計に組み込みやすい反面、
+                返済の初期は払った額の大半が利息に消え、元金がなかなか減りません。
+              </dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-slate-800">元金均等返済</dt>
+              <dd>
+                毎月減らす元金を一定にする方式。借りた直後の負担が重いかわりに、
+                同じ条件なら総利息は元利均等より少なくなります。
+              </dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-slate-800">リボ払い</dt>
+              <dd>
+                毎月の支払額を先に決める方式。負担感は出にくいのですが、
+                手数料の割合が大きいと元金の減りが極端に遅くなります。
+                利息の目安は「残高 × 年利 ÷ 12」。残高 50 万円・年率 15% ならひと月あたり約 6,250 円で、
+                月 1 万円払っても元金は 3,750 円ずつしか減りません。
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div>
+          <h2 className="mb-3 text-lg font-bold text-slate-900">繰り上げ返済は「型」で効果が変わる</h2>
+          <p className="text-sm leading-7">
+            期間短縮型は毎月の返済額を変えずに期間を縮める方法で、利息の削減効果が大きくなります。
+            返済額軽減型は毎月の負担を下げる方法で、削減効果は小さいかわりに手元の現金が楽になります。
+            複数の借入がある場合は、金額の大きいものではなく
+            <strong className="font-semibold text-slate-800">金利の高いものから先に潰す</strong>
+            のが原則です。減らすべきなのは残高ではなく、これから発生する利息のほうだからです。
+          </p>
+        </div>
+
+        <div className="rounded-xl border-l-2 border-indigo-300 bg-indigo-50/60 px-4 py-3 text-xs leading-6">
+          HENSAI は返済計画を試算するための道具です。金融商品の勧誘や、
+          個別の借入判断についての助言を行うものではありません。
+          実際の契約条件・返済額・手数料は、必ず契約先の明細でご確認ください。
+        </div>
+
+        <p className="text-xs text-slate-500">
+          このアプリの詳しい説明は
+          <a href="https://stellars-lab.com/hensai" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-indigo-600">Stellars Lab の紹介ページ</a>
+          にあります。使い方は<Link href="/help" className="underline underline-offset-4 hover:text-indigo-600">ヘルプ</Link>をどうぞ。
+        </p>
+      </section>
       </>
     );
   }
