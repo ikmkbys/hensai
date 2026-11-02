@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { loadData, saveData } from "@/lib/storage";
 import { downloadCSV, fromCSV, toCSV } from "@/lib/csv";
+import { getLastBackup, markBackup } from "@/lib/backup";
 import { Loan } from "@/lib/types";
 import { Trash2, AlertTriangle } from "lucide-react";
 
@@ -9,14 +10,17 @@ export default function SettingsPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [msg, setMsg] = useState<string>("");
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [lastBackup, setLastBackup] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setLoans(loadData().loans); }, []);
+  useEffect(() => { setLoans(loadData().loans); setLastBackup(getLastBackup()); }, []);
 
   function handleExport() {
     const csv = toCSV(loans);
     const stamp = new Date().toISOString().slice(0, 10);
     downloadCSV(`hensai_${stamp}.csv`, csv);
+    markBackup();
+    setLastBackup(getLastBackup());
     setMsg(`${loans.length}件をエクスポートしました`);
   }
 
@@ -101,6 +105,9 @@ export default function SettingsPage() {
         <h2 className="mb-2 font-semibold">データ管理</h2>
         <p className="mb-4 text-sm text-slate-600">
           このアプリのデータはブラウザ内（localStorage）にのみ保存されます。端末変更時はCSVでバックアップ・復元できます。
+        </p>
+        <p className="mb-4 text-sm text-slate-500">
+          最後のバックアップ：{lastBackup ? new Date(lastBackup).toLocaleDateString("ja-JP") : "まだありません"}
         </p>
         <div className="flex flex-wrap gap-3">
           <button onClick={handleExport} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">

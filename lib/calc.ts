@@ -21,6 +21,19 @@ export function rateAt(loan: Loan, dateStr: string): number {
   return current;
 }
 
+// 基準月(base)時点で残っている据置期間を月数で返す
+export function remainingGraceMonths(loan: Loan, base: Date): number {
+  if ((loan.gracePeriodMonths ?? 0) > 0 && loan.startDate) {
+    const start = new Date(loan.startDate);
+    const graceEnd = new Date(start.getFullYear(), start.getMonth() + loan.gracePeriodMonths!, 0);
+    const now = new Date(base.getFullYear(), base.getMonth(), 1);
+    if (graceEnd > now) {
+      return (graceEnd.getFullYear() - now.getFullYear()) * 12 + (graceEnd.getMonth() - now.getMonth()) + 1;
+    }
+  }
+  return 0;
+}
+
 export function buildSchedule(loan: Loan, maxMonths = 600, extraMonthly = 0): ScheduleRow[] {
   let balance = loan.currentBalance;
   const isRevolving = loan.repayType === "revolving";
@@ -31,16 +44,7 @@ export function buildSchedule(loan: Loan, maxMonths = 600, extraMonthly = 0): Sc
   const rows: ScheduleRow[] = [];
   const base = new Date();
 
-  // 残りの据置期間を月数で計算
-  let remainingGrace = 0;
-  if ((loan.gracePeriodMonths ?? 0) > 0 && loan.startDate) {
-    const start = new Date(loan.startDate);
-    const graceEnd = new Date(start.getFullYear(), start.getMonth() + loan.gracePeriodMonths!, 0);
-    const now = new Date(base.getFullYear(), base.getMonth(), 1);
-    if (graceEnd > now) {
-      remainingGrace = (graceEnd.getFullYear() - now.getFullYear()) * 12 + (graceEnd.getMonth() - now.getMonth()) + 1;
-    }
-  }
+  const remainingGrace = remainingGraceMonths(loan, base);
 
   for (let m = 1; m <= maxMonths && balance > 0; m++) {
     const d = new Date(base.getFullYear(), base.getMonth() + m - 1, 1);

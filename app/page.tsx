@@ -9,6 +9,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
 import BackupNoticeModal from "@/components/BackupNoticeModal";
+import BackupReminder from "@/components/BackupReminder";
 import { Target, Flame, HardDrive } from "lucide-react";
 
 export default function HomePage() {
@@ -177,6 +178,7 @@ export default function HomePage() {
           <Link href={`/loans/${unpaid[0].id}`} className="font-medium underline">記録する →</Link>
         </div>
       )}
+      <BackupReminder loans={loans} />
       <section className="grid gap-4 sm:grid-cols-3">
         <Stat label="総残高" value={fmtJPY(totalBalance)} tone="indigo" />
         <Stat label="月次返済合計" value={fmtJPY(totalMonthly)} tone="slate" />

@@ -6,6 +6,7 @@ const items = [
   { href: "/", label: "ホーム" },
   { href: "/loans", label: "借入一覧" },
   { href: "/simulator", label: "シミュレーター" },
+  { href: "/strategy", label: "優先順位" },
   { href: "/settings", label: "設定" },
   { href: "/help", label: "ヘルプ" },
 ];
@@ -22,14 +23,14 @@ export default function Nav() {
           </div>
           <span className="hidden text-xs text-slate-400 sm:inline">返済の見える化ツール</span>
         </Link>
-        <nav className="flex items-center gap-1 text-sm">
+        <nav className="flex min-w-0 items-center gap-1 overflow-x-auto text-sm">
           {items.map((i) => {
             const active = i.href === "/" ? path === "/" : path.startsWith(i.href);
             return (
               <Link
                 key={i.href}
                 href={i.href}
-                className={`rounded-md px-3 py-1.5 transition ${
+                className={`shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 transition sm:px-3 ${
                   active ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
