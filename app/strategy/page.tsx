@@ -3,9 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { loadData } from "@/lib/storage";
 import { Loan } from "@/lib/types";
 import { fmtJPY, rateAt } from "@/lib/calc";
-import { STRATEGY_LABEL, StrategyKey, StrategyResult, priorityOrder, simulateStrategy } from "@/lib/strategy";
+import { StrategyKey, StrategyResult, priorityOrder, simulateStrategy } from "@/lib/strategy";
 
 const KEYS: StrategyKey[] = ["baseline", "avalanche", "snowball"];
+
+/* この画面での呼び名。毎月の返済は全部払う前提なので「返す順」ではなく「上乗せ先」で言う */
+const LABEL: Record<StrategyKey, string> = {
+  baseline: "上乗せしない（今のまま）",
+  avalanche: "金利の高い借入に上乗せ",
+  snowball: "残高の少ない借入に上乗せ",
+};
 
 export default function StrategyPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -30,9 +37,9 @@ export default function StrategyPage() {
   if (active.length < 2) {
     return (
       <div className="space-y-4">
-        <h1 className="text-title font-bold">返済の優先順位</h1>
+        <h1 className="text-title font-bold">上乗せ返済の優先順位</h1>
         <div className="rounded-card border border-dashed border-border-strong bg-surface p-10 text-center text-muted">
-          残高のある借入が2件以上になると、どれから返すと得かを比べられます。
+          残高のある借入が2件以上になると、余らせたお金をどの借入に上乗せすると得かを比べられます。
         </div>
       </div>
     );
@@ -49,26 +56,30 @@ export default function StrategyPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-title font-bold">返済の優先順位</h1>
-      <p className="text-meta leading-7 text-muted">
-        借入が複数あるとき、追加で返せるお金を「どの借入から」充てるかで、払う利息の総額が変わります。
-        完済した借入の毎月の返済額は、次の月から次の借入へ回していく前提で試算します。
-      </p>
+      <h1 className="text-title font-bold">上乗せ返済の優先順位</h1>
+      <section className="rounded-card border border-border bg-surface p-5">
+        <h2 className="text-meta font-bold">このページの前提</h2>
+        <ul className="mt-2 space-y-1 text-meta leading-7 text-muted">
+          <li>・毎月の返済は、<span className="text-foreground">どの借入も決まった額を全部払う</span>前提です。ここで選ぶものではありません。</li>
+          <li>・比べるのは、毎月の返済とは別に<span className="text-foreground">余らせて回せるお金を、どの借入に上乗せするか</span>だけです。</li>
+          <li>・完済した借入の毎月の返済額は、次の月から上乗せ先へ回していきます。</li>
+        </ul>
+      </section>
 
       <section className="rounded-card border border-border bg-surface p-5">
         <label className="block max-w-xs">
-          <span className="mb-1 block text-meta font-medium">毎月の追加返済額（円）</span>
+          <span className="mb-1 block text-meta font-medium">毎月の上乗せ額（円）</span>
           <input type="number" min={0} className={input} value={extra || ""} placeholder="0" onChange={(e) => setExtra(Math.max(0, Number(e.target.value)))} />
         </label>
-        <p className="mt-2 text-meta text-muted">いまの毎月の返済に上乗せできる金額。0円のままでも、完済した借入の分を回す効果は見られます。</p>
+        <p className="mt-2 text-meta text-muted">毎月の決まった返済とは別に、余らせて回せる金額。0円のままだと、下の差は「完済した借入の返済額を次へ回す分」だけになります。</p>
       </section>
 
       {best && results[best].feasible && base.feasible && (
         <section className="rounded-card border border-positive/30 bg-positive-dim p-5 text-foreground">
-          <div className="text-meta text-positive">いちばん利息が少ない方法</div>
-          <div className="mt-1 text-title font-bold">{STRATEGY_LABEL[best]}</div>
+          <div className="text-meta text-positive">いちばん利息が少ない上乗せ先</div>
+          <div className="mt-1 text-title font-bold">{LABEL[best]}</div>
           <div className="mt-1 text-meta">
-            今のままより利息を <span className="font-bold tabular-nums">{fmtJPY(base.totalInterest - results[best].totalInterest)}</span> 減らせて、
+            上乗せしない場合より利息を <span className="font-bold tabular-nums">{fmtJPY(base.totalInterest - results[best].totalInterest)}</span> 減らせて、
             完済が <span className="font-bold tabular-nums">{base.months - results[best].months}ヶ月</span> 早まります。
           </div>
         </section>
@@ -78,10 +89,10 @@ export default function StrategyPage() {
         <table className="w-full min-w-[34rem] text-meta">
           <thead className="bg-surface-raised text-left text-meta text-muted">
             <tr>
-              <th className="px-4 py-3 font-medium">方法</th>
+              <th className="px-4 py-3 font-medium">上乗せの回し先</th>
               <th className="px-4 py-3 text-right font-medium">すべて完済</th>
               <th className="px-4 py-3 text-right font-medium">利息の総額</th>
-              <th className="px-4 py-3 text-right font-medium">今のままとの差</th>
+              <th className="px-4 py-3 text-right font-medium">上乗せしない場合との差</th>
             </tr>
           </thead>
           <tbody>
@@ -90,7 +101,7 @@ export default function StrategyPage() {
               const diff = r.feasible && base.feasible ? base.totalInterest - r.totalInterest : 0;
               return (
                 <tr key={k} className={`border-t border-border ${k === best ? "bg-positive-dim" : ""}`}>
-                  <td className="px-4 py-3 font-medium">{STRATEGY_LABEL[k]}{k === best && <span className="ml-2 rounded-pill bg-positive-dim px-2 py-0.5 text-meta text-positive">おすすめ</span>}</td>
+                  <td className="px-4 py-3 font-medium">{LABEL[k]}{k === best && <span className="ml-2 rounded-pill bg-positive-dim px-2 py-0.5 text-meta text-positive">おすすめ</span>}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.feasible ? `${r.finishDate ?? "—"}（${r.months}ヶ月）` : "要再計画"}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.feasible ? fmtJPY(r.totalInterest) : "∞"}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-positive">{k !== "baseline" && diff > 0 ? `${fmtJPY(diff)} 減` : "—"}</td>
@@ -102,14 +113,14 @@ export default function StrategyPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <OrderCard title={STRATEGY_LABEL.avalanche} loans={avaOrder} today={today} note="利息の発生が大きい借入から減らす順番。多くの場合、総利息がいちばん少なくなります。" />
-        <OrderCard title={STRATEGY_LABEL.snowball} loans={snowOrder} today={today} note="早く1件ずつ片付けて、返済の負担と気持ちを軽くしていく順番。" />
+        <OrderCard title={LABEL.avalanche} loans={avaOrder} today={today} note="金利の高い借入から先に上乗せしていく順番。利息の発生が大きいところから減らすので、多くの場合、総利息がいちばん少なくなります。" />
+        <OrderCard title={LABEL.snowball} loans={snowOrder} today={today} note="残高の少ない借入から先に上乗せしていく順番。早く1件ずつ片付けて、返済の負担と気持ちを軽くします。" />
       </section>
       {sameOrder && <p className="text-meta text-muted">いまは2つの順番が同じなので、結果の差は出ません。</p>}
 
       {best && results[best].payoffs.length > 0 && (
         <section className="rounded-card border border-border bg-surface p-5">
-          <h2 className="mb-3 font-semibold">「{STRATEGY_LABEL[best]}」の完済の流れ</h2>
+          <h2 className="mb-3 font-semibold">「{LABEL[best]}」の場合の完済の流れ</h2>
           <ol className="space-y-2 text-meta">
             {results[best].payoffs.map((p, i) => (
               <li key={p.loanId} className="flex items-center gap-3">
