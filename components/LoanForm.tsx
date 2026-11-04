@@ -189,7 +189,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "ä
           <label className="flex cursor-pointer items-center gap-2 text-meta font-medium">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded accent-indigo-600"
+              className="h-4 w-4 rounded accent-accent"
               checked={(form.bonusMonths?.length ?? 0) > 0}
               onChange={(e) => set("bonusMonths", e.target.checked ? [6, 12] : [])}
             />
