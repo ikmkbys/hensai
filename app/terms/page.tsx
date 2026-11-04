@@ -3,12 +3,12 @@ export const metadata = { title: "利用規約 — HENSAI" };
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-16">
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-6">
-        <h1 className="text-2xl font-bold">利用規約</h1>
-        <p className="mt-1 text-xs text-slate-400">最終更新日：2026年4月21日</p>
+      <div className="rounded-card bg-gradient-to-br from-accent-dim to-surface p-6">
+        <h1 className="text-section font-bold">利用規約</h1>
+        <p className="mt-1 text-meta text-muted">最終更新日：2026年4月21日</p>
       </div>
 
-      <p className="text-sm text-slate-600">
+      <p className="text-meta text-muted">
         本規約は、Stellars Lab（以下「当方」）が提供する「HENSAI」（以下「本サービス」）の利用条件を定めるものです。本サービスをご利用いただくことで、本規約に同意したものとみなします。
       </p>
 
@@ -20,7 +20,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="2. 利用条件">
-        <ul className="list-disc list-inside space-y-1 text-slate-600">
+        <ul className="list-disc list-inside space-y-1 text-muted">
           <li>本サービスは個人利用を目的としています</li>
           <li>不正アクセス・リバースエンジニアリング等の行為は禁止します</li>
           <li>本サービスを利用した結果については、利用者自身の責任のもとで判断してください</li>
@@ -31,7 +31,7 @@ export default function TermsPage() {
         <p>
           当方は、以下について一切の責任を負いません。
         </p>
-        <ul className="mt-2 list-disc list-inside space-y-1 text-slate-600">
+        <ul className="mt-2 list-disc list-inside space-y-1 text-muted">
           <li>ブラウザのデータ削除・端末の故障等によるデータの紛失</li>
           <li>本サービスの計算結果にもとづく財務上の損失</li>
           <li>本サービスの停止・変更・終了による損害</li>
@@ -44,7 +44,7 @@ export default function TermsPage() {
 
       <Section title="4. データの取り扱い">
         <p>
-          データの取り扱いについては、<a href="/privacy" className="text-indigo-600 hover:underline">プライバシーポリシー</a>をご確認ください。
+          データの取り扱いについては、<a href="/privacy" className="text-accent hover:underline">プライバシーポリシー</a>をご確認ください。
           定期的なCSVエクスポートによるバックアップをおすすめします。
         </p>
       </Section>
@@ -66,7 +66,7 @@ export default function TermsPage() {
       <Section title="お問い合わせ">
         <p>
           本規約に関するお問い合わせは{" "}
-          <a href="mailto:stellarsbit@gmail.com" className="text-indigo-600 hover:underline">
+          <a href="mailto:stellarsbit@gmail.com" className="text-accent hover:underline">
             stellarsbit@gmail.com
           </a>{" "}
           までご連絡ください。
@@ -78,9 +78,9 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h2 className="mb-3 font-bold text-slate-800">{title}</h2>
-      <div className="text-sm text-slate-600 leading-relaxed">{children}</div>
+    <section className="rounded-card border border-border bg-surface p-5">
+      <h2 className="mb-3 font-bold text-foreground">{title}</h2>
+      <div className="text-meta text-muted leading-relaxed">{children}</div>
     </section>
   );
 }

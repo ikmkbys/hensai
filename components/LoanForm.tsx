@@ -4,7 +4,7 @@ import { Loan } from "@/lib/types";
 import { newId } from "@/lib/storage";
 import { fmtJPY } from "@/lib/calc";
 
-const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#06b6d4", "#8b5cf6", "#ec4899", "#84cc16"];
+const COLORS = ["#e6b450", "#5fc39a", "#79b4e0", "#b39ae8", "#f08a7e", "#4fc3d0", "#e58bb4", "#a9c95a"];
 
 type Props = {
   initial?: Partial<Loan>;
@@ -70,7 +70,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-card border border-border bg-surface p-5">
       <Row label="借入名" required>
         <input className={input} value={form.name} onChange={(e) => set("name", e.target.value)} required placeholder="例：住宅ローン" />
       </Row>
@@ -88,10 +88,10 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
               key={t}
               type="button"
               onClick={() => set("repayType", t)}
-              className={`rounded-lg border px-4 py-2 text-sm transition ${
+              className={`rounded-control border px-4 py-2 text-meta transition ${
                 form.repayType === t
-                  ? "border-indigo-500 bg-indigo-50 font-medium text-indigo-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  ? "border-accent/30 bg-accent-dim font-medium text-accent"
+                  : "border-border bg-surface text-muted hover:bg-surface-hover"
               }`}
             >
               {label}
@@ -99,32 +99,32 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
           ))}
         </div>
         {form.repayType === "fixed" && (
-          <p className="mt-1.5 text-xs text-slate-500">毎月同じ金額を返済。元金と利息の内訳は変わりますが、支払額は完済まで一定です。</p>
+          <p className="mt-1.5 text-meta text-muted">毎月同じ金額を返済。元金と利息の内訳は変わりますが、支払額は完済まで一定です。</p>
         )}
         {form.repayType === "principal_equal" && (
-          <p className="mt-1.5 text-xs text-slate-500">毎月同額の元金を返済。利息は残高に応じて変動するため、月々の支払いは徐々に減ります。</p>
+          <p className="mt-1.5 text-meta text-muted">毎月同額の元金を返済。利息は残高に応じて変動するため、月々の支払いは徐々に減ります。</p>
         )}
         {form.repayType === "revolving" && (
-          <p className="mt-1.5 text-xs text-slate-500">残高に対して一定の率で返済。残高が減ると支払額も減りますが、利息が多く元金が減りにくい点に注意。</p>
+          <p className="mt-1.5 text-meta text-muted">残高に対して一定の率で返済。残高が減ると支払額も減りますが、利息が多く元金が減りにくい点に注意。</p>
         )}
       </Row>
       {form.repayType !== "revolving" && (
         <Row label="据置期間（ヶ月）">
           <input type="number" min={0} className={input} value={form.gracePeriodMonths || ""} onChange={(e) => set("gracePeriodMonths", Number(e.target.value))} placeholder="0 = なし" />
           {(form.gracePeriodMonths ?? 0) > 0 && (
-            <span className="mt-1 block text-xs text-slate-500">開始から {form.gracePeriodMonths} ヶ月間は利息のみ支払い、元金は変わりません。</span>
+            <span className="mt-1 block text-meta text-muted">開始から {form.gracePeriodMonths} ヶ月間は利息のみ支払い、元金は変わりません。</span>
           )}
         </Row>
       )}
       <div className="grid gap-5 sm:grid-cols-2">
         <Row label="当初借入額（円）" required>
           <input type="number" min={0} className={input} value={form.principal || ""} onChange={(e) => set("principal", Number(e.target.value))} required />
-          {form.principal > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.principal)}</span>}
+          {form.principal > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.principal)}</span>}
         </Row>
         <Row label="現在残高（円）" required>
-          <input type="number" min={0} className={`${input} ${balanceError ? "border-red-400" : ""}`} value={form.currentBalance || ""} onChange={(e) => set("currentBalance", Number(e.target.value))} required />
-          {form.currentBalance > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.currentBalance)}</span>}
-          {balanceError && <span className="mt-1 block text-xs text-red-500">現在残高は当初借入額以下にしてください</span>}
+          <input type="number" min={0} className={`${input} ${balanceError ? "border-danger/50" : ""}`} value={form.currentBalance || ""} onChange={(e) => set("currentBalance", Number(e.target.value))} required />
+          {form.currentBalance > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.currentBalance)}</span>}
+          {balanceError && <span className="mt-1 block text-meta text-danger">現在残高は当初借入額以下にしてください</span>}
         </Row>
         <Row label="年利（%）">
           <input
@@ -137,30 +137,30 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
             placeholder="0 = 無利子"
           />
           {rateStr === "0" && (
-            <span className="mt-1 block text-xs text-emerald-600">無利子（知人への借入など）</span>
+            <span className="mt-1 block text-meta text-positive">無利子（知人への借入など）</span>
           )}
         </Row>
         {form.repayType === "revolving" ? (
           <>
             <Row label="毎月支払い率（%）" required>
               <input type="number" step="0.1" min={0.1} className={input} value={form.revolvingRate || ""} onChange={(e) => set("revolvingRate", Number(e.target.value))} required placeholder="例：1.0" />
-              <span className="mt-1 block text-xs text-slate-400">残高 × この率 = 月の支払い額</span>
+              <span className="mt-1 block text-meta text-muted">残高 × この率 = 月の支払い額</span>
             </Row>
             <Row label="最低支払額（円）">
               <input type="number" min={0} className={input} value={form.revolvingMin || ""} onChange={(e) => set("revolvingMin", Number(e.target.value))} placeholder="例：5000" />
-              {form.revolvingMin != null && form.revolvingMin > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.revolvingMin)}</span>}
+              {form.revolvingMin != null && form.revolvingMin > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.revolvingMin)}</span>}
             </Row>
           </>
         ) : form.repayType === "principal_equal" ? (
           <Row label="毎月の元金返済額（円）" required>
             <input type="number" min={0} className={input} value={form.principalPerMonth || ""} onChange={(e) => set("principalPerMonth", Number(e.target.value))} required placeholder="例：50000" />
-            {(form.principalPerMonth ?? 0) > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.principalPerMonth!)} ＋ 利息（変動）</span>}
+            {(form.principalPerMonth ?? 0) > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.principalPerMonth!)} ＋ 利息（変動）</span>}
             <div className="mt-2 flex items-center gap-2">
               <input type="number" min={1} placeholder="期間（ヶ月）" className={`${input} w-32`} value={termMonths || ""} onChange={(e) => setTermMonths(Number(e.target.value))} />
               <button type="button" onClick={() => {
                 const balance = form.currentBalance > 0 ? form.currentBalance : form.principal;
                 if (balance > 0 && termMonths > 0) set("principalPerMonth", Math.ceil(balance / termMonths));
-              }} className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50">
+              }} className="whitespace-nowrap rounded-control border border-border-strong bg-surface px-3 py-2 text-meta hover:bg-surface-hover">
                 自動計算
               </button>
             </div>
@@ -168,10 +168,10 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
         ) : (
           <Row label="月次返済額（円）" required>
             <input type="number" min={0} className={input} value={form.monthlyPayment || ""} onChange={(e) => set("monthlyPayment", Number(e.target.value))} required />
-            {form.monthlyPayment > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.monthlyPayment)}</span>}
+            {form.monthlyPayment > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.monthlyPayment)}</span>}
             <div className="mt-2 flex items-center gap-2">
               <input type="number" min={1} placeholder="期間（ヶ月）" className={`${input} w-32`} value={termMonths || ""} onChange={(e) => setTermMonths(Number(e.target.value))} />
-              <button type="button" onClick={calcMonthlyPayment} className="whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs hover:bg-slate-50">
+              <button type="button" onClick={calcMonthlyPayment} className="whitespace-nowrap rounded-control border border-border-strong bg-surface px-3 py-2 text-meta hover:bg-surface-hover">
                 自動計算
               </button>
             </div>
@@ -185,8 +185,8 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
         </Row>
       </div>
       {form.repayType !== "revolving" && (
-        <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
+        <div className="rounded-control border border-border bg-surface-raised p-4">
+          <label className="flex cursor-pointer items-center gap-2 text-meta font-medium">
             <input
               type="checkbox"
               className="h-4 w-4 rounded accent-indigo-600"
@@ -199,7 +199,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <Row label="ボーナス追加払い（円）">
                 <input type="number" min={0} className={input} value={form.bonusPayment || ""} onChange={(e) => set("bonusPayment", Number(e.target.value))} placeholder="例：100000" />
-                {(form.bonusPayment ?? 0) > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(form.bonusPayment!)}</span>}
+                {(form.bonusPayment ?? 0) > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(form.bonusPayment!)}</span>}
               </Row>
               <Row label="ボーナス月">
                 <div className="flex flex-wrap gap-1.5">
@@ -213,14 +213,14 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
                           const cur = form.bonusMonths ?? [];
                           set("bonusMonths", checked ? cur.filter((x) => x !== m) : [...cur, m].sort((a, b) => a - b));
                         }}
-                        className={`h-8 w-8 rounded-lg text-xs font-medium transition ${checked ? "bg-indigo-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
+                        className={`h-8 w-8 rounded-control text-meta font-medium transition ${checked ? "bg-accent text-accent-on" : "border border-border bg-surface text-muted hover:bg-surface-hover"}`}
                       >
                         {m}
                       </button>
                     );
                   })}
                 </div>
-                <span className="mt-1 block text-xs text-slate-400">選択した月に追加払いが発生</span>
+                <span className="mt-1 block text-meta text-muted">選択した月に追加払いが発生</span>
               </Row>
             </div>
           )}
@@ -233,7 +233,7 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
               key={c}
               type="button"
               onClick={() => set("color", c)}
-              className={`h-8 w-8 rounded-full ring-offset-2 transition ${form.color === c ? "ring-2 ring-slate-900" : ""}`}
+              className={`h-8 w-8 rounded-pill ring-offset-2 transition ${form.color === c ? "ring-2 ring-accent" : ""}`}
               style={{ background: c }}
               aria-label={c}
             />
@@ -246,21 +246,21 @@ export default function LoanForm({ initial, onSubmit, onDelete, submitLabel = "�
 
       <div className="flex items-center justify-between gap-3 pt-2">
         {onDelete ? (
-          <button type="button" onClick={onDelete} className="text-sm text-red-600 hover:underline">削除</button>
+          <button type="button" onClick={onDelete} className="text-meta text-danger hover:underline">削除</button>
         ) : <span />}
-        <button type="submit" className="rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700">{submitLabel}</button>
+        <button type="submit" className="rounded-control bg-accent px-5 py-2.5 font-medium text-accent-on hover:bg-accent/85">{submitLabel}</button>
       </div>
     </form>
   );
 }
 
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const input = "w-full rounded-control border border-border bg-surface-raised px-3 py-2.5 text-meta outline-none focus:border-accent focus:ring-2 focus:ring-accent/25";
 
 function Row({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">
-        {label}{required && <span className="ml-1 text-red-500">*</span>}
+      <span className="mb-1 block text-meta font-medium text-foreground">
+        {label}{required && <span className="ml-1 text-danger">*</span>}
       </span>
       {children}
     </label>

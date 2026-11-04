@@ -14,24 +14,26 @@ const items = [
 export default function Nav() {
   const path = usePathname();
   return (
-    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex flex-col">
-            <span className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent font-bold tracking-tight text-lg leading-tight">HENSAI</span>
-            <span className="h-0.5 w-full rounded-full bg-gradient-to-r from-indigo-600 to-violet-500" />
-          </div>
-          <span className="hidden text-xs text-slate-400 sm:inline">返済の見える化ツール</span>
+    <header className="sticky top-0 border-b border-border bg-background/85 backdrop-blur" style={{ zIndex: "var(--z-header)" }}>
+      <div className="app-width flex items-center justify-between gap-3 px-4 py-3 md:px-6">
+        <Link href="/" className="flex shrink-0 items-center gap-3">
+          {/* スタンドの灯り：アクセントはここと「いま」の印だけに使う */}
+          <span className="h-2 w-2 rounded-pill bg-accent" aria-hidden />
+          <span className="tabular-nums text-title font-bold tracking-[0.18em] text-foreground">HENSAI</span>
+          <span className="hidden text-meta text-muted sm:inline">返済の見える化ツール</span>
         </Link>
-        <nav className="flex min-w-0 items-center gap-1 overflow-x-auto text-sm">
+        <nav aria-label="メイン" className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto text-meta">
           {items.map((i) => {
             const active = i.href === "/" ? path === "/" : path.startsWith(i.href);
             return (
               <Link
                 key={i.href}
                 href={i.href}
-                className={`shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 transition sm:px-3 ${
-                  active ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"
+                aria-current={active ? "page" : undefined}
+                className={`shrink-0 whitespace-nowrap rounded-control px-2 py-1.5 transition-colors sm:px-3 ${
+                  active
+                    ? "bg-accent-dim font-bold text-accent underline decoration-2 underline-offset-8"
+                    : "text-muted hover:bg-surface-raised hover:text-foreground"
                 }`}
               >
                 {i.label}

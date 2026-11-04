@@ -6,10 +6,10 @@ export default function HelpPage() {
     <div className="mx-auto max-w-2xl space-y-10 pb-16">
 
       {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-6 text-center">
-        <div className="mb-3 flex justify-center"><BookOpen className="h-10 w-10 text-indigo-600" /></div>
-        <h1 className="text-2xl font-bold">HENSAI の使い方</h1>
-        <p className="mt-2 text-slate-600">借入を登録して、返済を記録するだけ。完済への道を一緒に歩もう。</p>
+      <div className="rounded-card bg-gradient-to-br from-accent-dim to-surface p-6 text-center">
+        <div className="mb-3 flex justify-center"><BookOpen className="h-10 w-10 text-accent" /></div>
+        <h1 className="text-section font-bold">HENSAI の使い方</h1>
+        <p className="mt-2 text-muted">借入を登録して、返済を記録するだけ。完済への道を一緒に歩もう。</p>
       </div>
 
       {/* Quick Start */}
@@ -22,7 +22,7 @@ export default function HelpPage() {
         <div className="mt-4 text-center">
           <Link
             href="/loans/new"
-            className="inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+            className="inline-block rounded-control bg-accent px-5 py-2.5 font-medium text-accent-on hover:bg-accent/85"
           >
             最初の借入を登録する →
           </Link>
@@ -46,7 +46,7 @@ export default function HelpPage() {
 
       {/* 返済記録 */}
       <Section title="返済記録" icon={<CreditCard className="h-5 w-5" />}>
-        <p className="text-sm text-slate-700">
+        <p className="text-meta text-foreground">
           借入詳細ページの「今月の返済を記録」から、日付・金額・メモを入力して記録します。
         </p>
         <div className="mt-3 space-y-2">
@@ -64,7 +64,7 @@ export default function HelpPage() {
 
       {/* 金利変更 */}
       <Section title="金利変更" icon={<BarChart2 className="h-5 w-5" />}>
-        <p className="text-sm text-slate-700">
+        <p className="text-meta text-foreground">
           変動金利のローンは、金利が変わったタイミングで「金利変更を追加」から登録します。
           適用開始日以降のスケジュール計算に新しい金利が使われます。
         </p>
@@ -75,7 +75,7 @@ export default function HelpPage() {
 
       {/* シミュレーター */}
       <Section title="シミュレーター" icon={<Calculator className="h-5 w-5" />}>
-        <p className="text-sm text-slate-700">
+        <p className="text-meta text-foreground">
           「もし毎月の返済を増やしたら？」「一括で繰り上げ返済したら？」の効果を試算できます。
         </p>
         <div className="mt-3 space-y-2">
@@ -93,25 +93,25 @@ export default function HelpPage() {
           <Item title="完済予定">最も遅く終わる借入の完済月。全借入が終わる目標日です。</Item>
           <Item title="全体の進捗バー">「返済済み ÷ 当初合計」で計算。25/50/75% に達するとバッジが表示されます。</Item>
           <Item title="累計返済額">これまでに記録した返済金額の合計（元金＋利息）。</Item>
-          <Item title="連続返済"><Flame className="inline h-3.5 w-3.5 mr-0.5 text-orange-500 align-text-bottom" />連続して返済を記録している月数。途切れるとリセットされます。</Item>
+          <Item title="連続返済"><Flame className="inline h-3.5 w-3.5 mr-0.5 text-accent align-text-bottom" />連続して返済を記録している月数。途切れるとリセットされます。</Item>
         </div>
       </Section>
 
       {/* データ管理 */}
       <Section title="データのバックアップ" icon={<HardDrive className="h-5 w-5" />}>
-        <p className="text-sm text-slate-700">
+        <p className="text-meta text-foreground">
           HENSAIのデータはサーバーに送信されず、<strong>このブラウザにのみ保存</strong>されています。プライバシーに配慮した設計ですが、ブラウザの設定変更や端末の切り替えによってデータが失われることがあります。
         </p>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 text-sm">
+        <div className="mt-4 overflow-hidden rounded-control border border-border text-meta">
           <table className="w-full">
-            <thead className="bg-slate-50 text-xs text-slate-500">
+            <thead className="bg-surface-raised text-meta text-muted">
               <tr>
                 <th className="px-3 py-2 text-left font-medium">操作</th>
                 <th className="px-3 py-2 text-center font-medium">データ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {[
                 ["キャッシュをクリア", "消えない ✅"],
                 ["Cookieをクリア", "消えない ✅"],
@@ -120,7 +120,7 @@ export default function HelpPage() {
                 ["別ブラウザ・別端末で開く", "表示されない ❌"],
               ].map(([op, result]) => (
                 <tr key={op}>
-                  <td className="px-3 py-2 text-slate-700">{op}</td>
+                  <td className="px-3 py-2 text-foreground">{op}</td>
                   <td className="px-3 py-2 text-center">{result}</td>
                 </tr>
               ))}
@@ -165,8 +165,8 @@ export default function HelpPage() {
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-800">
-        {icon && <span className="text-indigo-600">{icon}</span>}
+      <h2 className="mb-4 flex items-center gap-2 text-title font-bold text-foreground">
+        {icon && <span className="text-accent">{icon}</span>}
         {title}
       </h2>
       {children}
@@ -176,40 +176,40 @@ function Section({ title, icon, children }: { title: string; icon?: React.ReactN
 
 function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
-      <div className="mx-auto mb-2 grid h-9 w-9 place-items-center rounded-full bg-indigo-600 font-bold text-white">
+    <div className="rounded-control border border-border bg-surface p-4 text-center">
+      <div className="mx-auto mb-2 grid h-9 w-9 place-items-center rounded-pill bg-accent font-bold text-accent-on">
         {n}
       </div>
       <div className="font-semibold">{title}</div>
-      <p className="mt-1 text-xs text-slate-500">{desc}</p>
+      <p className="mt-1 text-meta text-muted">{desc}</p>
     </div>
   );
 }
 
 function FieldRow({ label, desc }: { label: string; desc: string }) {
   return (
-    <div className="flex gap-3 rounded-lg border border-slate-100 bg-white p-3">
-      <span className="mt-0.5 min-w-24 text-xs font-semibold text-indigo-700">{label}</span>
-      <span className="text-sm text-slate-600">{desc}</span>
+    <div className="flex gap-3 rounded-control border border-border bg-surface p-3">
+      <span className="mt-0.5 min-w-24 text-meta font-semibold text-accent">{label}</span>
+      <span className="text-meta text-muted">{desc}</span>
     </div>
   );
 }
 
 function Item({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-slate-100 bg-white p-3">
-      <div className="text-sm font-semibold text-slate-800">{title}</div>
-      <p className="mt-0.5 text-sm text-slate-600">{children}</p>
+    <div className="rounded-control border border-border bg-surface p-3">
+      <div className="text-meta font-semibold text-foreground">{title}</div>
+      <p className="mt-0.5 text-meta text-muted">{children}</p>
     </div>
   );
 }
 
 function Callout({ children, type = "info" }: { children: React.ReactNode; type?: "info" | "warn" }) {
   const styles = type === "warn"
-    ? "border-amber-200 bg-amber-50 text-amber-800"
-    : "border-indigo-100 bg-indigo-50 text-indigo-800";
+    ? "border-accent/30 bg-accent-dim text-accent"
+    : "border-accent/30 bg-accent-dim text-accent";
   return (
-    <div className={`mt-3 rounded-xl border p-4 text-sm ${styles}`}>
+    <div className={`mt-3 rounded-control border p-4 text-meta ${styles}`}>
       {children}
     </div>
   );
@@ -217,9 +217,9 @@ function Callout({ children, type = "info" }: { children: React.ReactNode; type?
 
 function Faq({ q, children }: { q: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="font-semibold text-slate-800">Q. {q}</div>
-      <p className="mt-2 text-sm text-slate-600">{children}</p>
+    <div className="rounded-control border border-border bg-surface p-4">
+      <div className="font-semibold text-foreground">Q. {q}</div>
+      <p className="mt-2 text-meta text-muted">{children}</p>
     </div>
   );
 }

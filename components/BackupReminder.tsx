@@ -17,7 +17,7 @@ export default function BackupReminder({ loans }: { loans: Loan[] }) {
 
   if (!show) return null;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-accent/30 bg-accent-dim p-4 text-meta text-accent">
       <span>
         <HardDrive className="mr-1 inline h-4 w-4 align-text-bottom" />
         {days === null ? "まだバックアップを取っていません。" : `最後のバックアップから${days}日たちました。`}
@@ -25,7 +25,7 @@ export default function BackupReminder({ loans }: { loans: Loan[] }) {
       </span>
       <span className="flex items-center gap-3">
         <Link href="/settings" className="font-medium underline">バックアップする →</Link>
-        <button onClick={() => { snoozeBackup(); setShow(false); }} className="text-indigo-700/70 hover:text-indigo-900">あとで</button>
+        <button onClick={() => { snoozeBackup(); setShow(false); }} className="text-accent/70 hover:text-accent">あとで</button>
       </span>
     </div>
   );

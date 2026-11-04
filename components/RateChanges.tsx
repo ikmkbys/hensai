@@ -47,7 +47,7 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
   const confirmTarget = confirmId ? (loan.rateChanges ?? []).find((r) => r.id === confirmId) : undefined;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="rounded-card border border-border bg-surface p-5">
       <ConfirmDialog
         open={!!confirmTarget}
         title="金利変更を削除しますか？"
@@ -59,25 +59,25 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
         <h2 className="font-semibold">金利変更履歴</h2>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+          className="rounded-control border border-border-strong bg-surface px-4 py-2 text-meta hover:bg-surface-hover"
         >
           {open ? "キャンセル" : "+ 金利変更を追加"}
         </button>
       </div>
-      <p className="mb-3 text-xs text-slate-500">初期金利：{loan.annualRate}%（{loan.startDate} 〜）</p>
+      <p className="mb-3 text-meta text-muted">初期金利：{loan.annualRate}%（{loan.startDate} 〜）</p>
 
       {open && (
-        <div className="mb-4 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-3">
-          <label className="block text-sm">
+        <div className="mb-4 grid gap-3 rounded-control bg-surface-raised p-4 sm:grid-cols-3">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">適用開始日</span>
             <input type="date" className={input} value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">新しい年利（%）</span>
             <input type="number" step="0.01" min={0} className={input} value={rate || ""} onChange={(e) => setRate(Number(e.target.value))} />
           </label>
           <div className="sm:col-span-3">
-            <button onClick={add} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+            <button onClick={add} className="rounded-control bg-accent px-4 py-2 text-meta font-medium text-accent-on hover:bg-accent/85">
               追加する
             </button>
           </div>
@@ -85,17 +85,17 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
       )}
 
       {savingsFeedback && (
-        <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+        <div className="mb-3 rounded-control border border-positive/30 bg-positive-dim p-3 text-meta text-positive">
           <TrendingDown className="inline h-4 w-4 mr-1 align-text-bottom" />金利が {savingsFeedback.prevRate}% → {savingsFeedback.newRate}% に下がりました！
           月々の利息負担が約 {fmtJPY(savingsFeedback.monthly)} 軽減されます。
         </div>
       )}
       {list.length === 0 ? (
-        <p className="text-sm text-slate-500">金利変更はまだ登録されていません。</p>
+        <p className="text-meta text-muted">金利変更はまだ登録されていません。</p>
       ) : (
-        <table className="w-full text-sm">
+        <table className="w-full text-meta">
           <thead>
-            <tr className="text-left text-xs text-slate-500">
+            <tr className="text-left text-meta text-muted">
               <th className="py-2 pr-4">適用開始</th>
               <th className="py-2 pr-4 text-right">年利</th>
               <th className="py-2"></th>
@@ -103,11 +103,11 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
           </thead>
           <tbody>
             {list.map((r) => (
-              <tr key={r.id} className="border-t border-slate-100 tabular-nums">
+              <tr key={r.id} className="border-t border-border tabular-nums">
                 <td className="py-1.5 pr-4">{r.date}</td>
                 <td className="py-1.5 pr-4 text-right font-medium">{r.annualRate}%</td>
                 <td className="py-1.5 text-right">
-                  <button onClick={() => setConfirmId(r.id)} className="text-xs text-red-600 hover:underline">削除</button>
+                  <button onClick={() => setConfirmId(r.id)} className="text-meta text-danger hover:underline">削除</button>
                 </td>
               </tr>
             ))}
@@ -118,4 +118,4 @@ export default function RateChanges({ loan, onChange }: { loan: Loan; onChange: 
   );
 }
 
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const input = "w-full rounded-control border border-border bg-surface-raised px-3 py-2.5 text-meta outline-none focus:border-accent focus:ring-2 focus:ring-accent/25";

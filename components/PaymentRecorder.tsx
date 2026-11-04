@@ -50,7 +50,7 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
   const confirmTarget = confirmId ? (loan.payments ?? []).find((p) => p.id === confirmId) : undefined;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="rounded-card border border-border bg-surface p-5">
       <ConfirmDialog
         open={!!confirmTarget}
         title="返済記録を取り消しますか？"
@@ -63,28 +63,28 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
         <h2 className="font-semibold">返済履歴</h2>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-control bg-accent px-4 py-2 text-meta font-medium text-accent-on hover:bg-accent/85"
         >
           {open ? "キャンセル" : "今月の返済を記録"}
         </button>
       </div>
 
       {open && (
-        <div className="mb-4 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-3">
-          <label className="block text-sm">
+        <div className="mb-4 grid gap-3 rounded-control bg-surface-raised p-4 sm:grid-cols-3">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">日付</span>
             <input type="date" className={input} value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">金額（円）</span>
             <input type="number" min={0} className={input} value={amount || ""} onChange={(e) => setAmount(Number(e.target.value))} />
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">メモ</span>
             <input className={input} value={note} onChange={(e) => setNote(e.target.value)} placeholder="繰上げ等" />
           </label>
           <div className="sm:col-span-3">
-            <button onClick={record} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+            <button onClick={record} className="rounded-control bg-accent px-4 py-2.5 text-meta font-medium text-accent-on hover:bg-accent/85">
               記録する（残高 −{fmtJPY(amount)}）
             </button>
           </div>
@@ -92,12 +92,12 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
       )}
 
       {history.length === 0 ? (
-        <p className="text-sm text-slate-500">まだ記録がありません。</p>
+        <p className="text-meta text-muted">まだ記録がありません。</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-meta">
             <thead>
-              <tr className="text-left text-xs text-slate-500">
+              <tr className="text-left text-meta text-muted">
                 <th className="py-2 pr-4">日付</th>
                 <th className="py-2 pr-4 text-right">金額</th>
                 <th className="py-2 pr-4 text-right">元金</th>
@@ -108,14 +108,14 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
             </thead>
             <tbody>
               {history.map((p) => (
-                <tr key={p.id} className="border-t border-slate-100 tabular-nums">
+                <tr key={p.id} className="border-t border-border tabular-nums">
                   <td className="py-1.5 pr-4">{p.date}</td>
                   <td className="py-1.5 pr-4 text-right font-medium">{fmtJPY(p.amount)}</td>
                   <td className="py-1.5 pr-4 text-right">{p.principalPart != null ? fmtJPY(p.principalPart) : "—"}</td>
-                  <td className="py-1.5 pr-4 text-right text-slate-500">{p.interestPart != null ? fmtJPY(p.interestPart) : "—"}</td>
-                  <td className="py-1.5 pr-4 text-slate-600">{p.note}</td>
+                  <td className="py-1.5 pr-4 text-right text-muted">{p.interestPart != null ? fmtJPY(p.interestPart) : "—"}</td>
+                  <td className="py-1.5 pr-4 text-muted">{p.note}</td>
                   <td className="py-1.5 text-right">
-                    <button onClick={() => setConfirmId(p.id)} className="text-xs text-red-600 hover:underline">取消</button>
+                    <button onClick={() => setConfirmId(p.id)} className="text-meta text-danger hover:underline">取消</button>
                   </td>
                 </tr>
               ))}
@@ -127,4 +127,4 @@ export default function PaymentRecorder({ loan, onChange }: { loan: Loan; onChan
   );
 }
 
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const input = "w-full rounded-control border border-border bg-surface-raised px-3 py-2.5 text-meta outline-none focus:border-accent focus:ring-2 focus:ring-accent/25";

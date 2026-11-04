@@ -8,6 +8,7 @@ import { buildSchedule, calcStats, currentMonthPayment, fmtJPY, isPaidThisMonth,
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from "recharts";
+import { axisTick, chartGrid, legendProps, tooltipStyle } from "@/lib/chartTheme";
 import { PartyPopper, Trophy } from "lucide-react";
 import PaymentRecorder from "@/components/PaymentRecorder";
 import RateChanges from "@/components/RateChanges";
@@ -28,7 +29,7 @@ export default function LoanDetailPage() {
   }, [params.id]);
 
   if (loan === undefined) return null;
-  if (loan === null) return <div className="text-slate-500">見つかりませんでした。</div>;
+  if (loan === null) return <div className="text-muted">見つかりませんでした。</div>;
 
   const stats = calcStats(loan);
   const schedule = buildSchedule(loan);
@@ -41,8 +42,8 @@ export default function LoanDetailPage() {
     return (
       <div className="space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">借入を編集</h1>
-          <button onClick={() => setEditing(false)} className="text-sm text-slate-500 hover:underline">キャンセル</button>
+          <h1 className="text-title font-bold">借入を編集</h1>
+          <button onClick={() => setEditing(false)} className="text-meta text-muted hover:underline">キャンセル</button>
         </div>
         <LoanForm
           initial={loan}
@@ -64,23 +65,23 @@ export default function LoanDetailPage() {
   return (
     <div className="space-y-6">
       {loan.currentBalance === 0 && loan.principal > 0 && (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-          <div className="mb-2 flex justify-center"><PartyPopper className="h-10 w-10 text-emerald-600" /></div>
-          <h2 className="text-xl font-bold text-emerald-800">完済おめでとうございます！</h2>
-          <p className="mt-2 text-sm text-emerald-700">
+        <section className="rounded-card border border-positive/30 bg-positive-dim p-6 text-center">
+          <div className="mb-2 flex justify-center"><PartyPopper className="h-10 w-10 text-positive" /></div>
+          <h2 className="text-title font-bold text-positive">完済おめでとうございます！</h2>
+          <p className="mt-2 text-meta text-positive">
             累計返済額 {fmtJPY(totalLoanPaid)}・{loan.payments?.length ?? 0} 回の返済で達成
           </p>
         </section>
       )}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="h-10 w-10 rounded-lg" style={{ background: loan.color }} />
+          <span className="h-10 w-10 rounded-control" style={{ background: loan.color }} />
           <div>
-            <h1 className="text-xl font-bold">{loan.name}</h1>
-            <div className="text-sm text-slate-500">{loan.lender || "借入先未設定"}</div>
+            <h1 className="text-title font-bold">{loan.name}</h1>
+            <div className="text-meta text-muted">{loan.lender || "借入先未設定"}</div>
           </div>
         </div>
-        <button onClick={() => setEditing(true)} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">編集</button>
+        <button onClick={() => setEditing(true)} className="rounded-control border border-border-strong bg-surface px-4 py-2 text-meta hover:bg-surface-hover">編集</button>
       </div>
 
       <section className="grid gap-3 sm:grid-cols-4">
@@ -95,24 +96,24 @@ export default function LoanDetailPage() {
         <Stat label="利息総額（予測）" value={fmtJPY(stats.totalInterest)} />
       </section>
       {loan.repayType === "revolving" && (
-        <p className="text-xs text-slate-400">
+        <p className="text-meta text-muted">
           ※ 完済予定・利息総額・スケジュールは「残高の{loan.revolvingRate ?? 1}%・最低{(loan.revolvingMin ?? 5000).toLocaleString()}円」で試算した参考値です。実際の支払い額はカード会社の規定によって異なります。
         </p>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-card border border-border bg-surface p-5">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="font-semibold">返済進捗</h2>
-          <span className="text-sm text-slate-500">{pct.toFixed(1)}%</span>
+          <span className="text-meta text-muted">{pct.toFixed(1)}%</span>
         </div>
-        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full rounded-full" style={{ width: `${pct}%`, background: loan.color }} />
+        <div className="h-3 overflow-hidden rounded-pill bg-surface-raised">
+          <div className="h-full rounded-pill" style={{ width: `${pct}%`, background: loan.color }} />
         </div>
-        <p className="mt-2 text-xs text-slate-500">当初 {fmtJPY(loan.principal)} → 残り {fmtJPY(loan.currentBalance)}</p>
+        <p className="mt-2 text-meta text-muted">当初 {fmtJPY(loan.principal)} → 残り {fmtJPY(loan.currentBalance)}</p>
         {reachedMilestones.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
             {reachedMilestones.map((m) => (
-              <span key={m} className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700">
+              <span key={m} className="rounded-pill bg-accent-dim px-3 py-0.5 text-meta font-medium text-accent">
                 <Trophy className="inline h-3 w-3 mr-1 align-text-bottom" />{m}% 達成
               </span>
             ))}
@@ -121,7 +122,7 @@ export default function LoanDetailPage() {
       </section>
 
       {!stats.feasible && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="rounded-control border border-accent/30 bg-accent-dim p-4 text-meta text-accent">
           {loan.repayType === "revolving"
             ? "毎月の支払いが利息をまかなえないため、このままでは残高が減りません。支払い率・最低支払額の見直しが必要です。"
             : "月次返済額が利息を下回っているため、このままでは完済できません。返済額を増やすか、金利の見直しが必要です。"}
@@ -129,7 +130,7 @@ export default function LoanDetailPage() {
       )}
 
       {!isPaidThisMonth(loan) && isPaymentDuePast(loan) && loan.currentBalance > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="rounded-control border border-accent/30 bg-accent-dim p-4 text-meta text-accent">
           今月の返済記録がまだです（返済日：毎月{loan.paymentDay}日）。返済したら下の「記録する」から入力してください。
         </div>
       )}
@@ -139,29 +140,29 @@ export default function LoanDetailPage() {
       <RateChanges loan={loan} onChange={setLoan} />
       <BalanceAdjust loan={loan} onChange={setLoan} />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-card border border-border bg-surface p-5">
         <h2 className="mb-3 font-semibold">元金・利息の内訳（最初の5年）</h2>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={30} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万`} />
-              <Tooltip formatter={(v) => fmtJPY(v as number)} />
-              <Legend />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
+              <XAxis dataKey="date" tick={axisTick} minTickGap={30} />
+              <YAxis tick={axisTick} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万`} />
+              <Tooltip formatter={(v) => fmtJPY(v as number)} {...tooltipStyle} />
+              <Legend {...legendProps} />
               <Bar dataKey="元金" stackId="a" fill={loan.color} />
-              <Bar dataKey="利息" stackId="a" fill="#cbd5e1" />
+              <Bar dataKey="利息" stackId="a" fill="var(--muted-weak)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-card border border-border bg-surface p-5">
         <h2 className="mb-3 font-semibold">返済スケジュール</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-meta">
             <thead>
-              <tr className="text-left text-xs text-slate-500">
+              <tr className="text-left text-meta text-muted">
                 <th className="py-2 pr-4">回</th>
                 <th className="py-2 pr-4">年月</th>
                 <th className="py-2 pr-4 text-right">返済</th>
@@ -172,12 +173,12 @@ export default function LoanDetailPage() {
             </thead>
             <tbody>
               {(showAllSchedule ? schedule : schedule.slice(0, 12)).map((r) => (
-                <tr key={r.month} className="border-t border-slate-100 tabular-nums">
+                <tr key={r.month} className="border-t border-border tabular-nums">
                   <td className="py-1.5 pr-4">{r.month}</td>
                   <td className="py-1.5 pr-4">{r.date}</td>
                   <td className="py-1.5 pr-4 text-right">{fmtJPY(r.payment)}</td>
                   <td className="py-1.5 pr-4 text-right">{fmtJPY(r.principal)}</td>
-                  <td className="py-1.5 pr-4 text-right text-slate-500">{fmtJPY(r.interest)}</td>
+                  <td className="py-1.5 pr-4 text-right text-muted">{fmtJPY(r.interest)}</td>
                   <td className="py-1.5 text-right font-medium">{fmtJPY(r.balance)}</td>
                 </tr>
               ))}
@@ -187,7 +188,7 @@ export default function LoanDetailPage() {
         {schedule.length > 12 && (
           <button
             onClick={() => setShowAllSchedule((v) => !v)}
-            className="mt-3 text-sm text-indigo-600 hover:underline"
+            className="mt-3 text-meta text-accent hover:underline"
           >
             {showAllSchedule ? "折りたたむ" : `すべて表示（全${schedule.length}回）`}
           </button>
@@ -195,9 +196,9 @@ export default function LoanDetailPage() {
       </section>
 
       {loan.note && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+        <section className="rounded-card border border-border bg-surface p-5">
           <h2 className="mb-2 font-semibold">メモ</h2>
-          <p className="whitespace-pre-wrap text-sm text-slate-700">{loan.note}</p>
+          <p className="whitespace-pre-wrap text-meta text-foreground">{loan.note}</p>
         </section>
       )}
     </div>
@@ -206,9 +207,9 @@ export default function LoanDetailPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="mt-1 text-lg font-bold tabular-nums">{value}</div>
+    <div className="rounded-card border border-border bg-surface p-4">
+      <div className="text-meta text-muted">{label}</div>
+      <div className="mt-1 text-title font-bold tabular-nums">{value}</div>
     </div>
   );
 }

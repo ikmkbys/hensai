@@ -45,7 +45,7 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
   const confirmTarget = confirmId ? (loan.charges ?? []).find((c) => c.id === confirmId) : undefined;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="rounded-card border border-border bg-surface p-5">
       <ConfirmDialog
         open={!!confirmTarget}
         title="利用記録を削除しますか？"
@@ -57,30 +57,30 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
         <h2 className="font-semibold">利用額の追加</h2>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+          className="rounded-control border border-border-strong bg-surface px-4 py-2 text-meta hover:bg-surface-hover"
         >
           {open ? "キャンセル" : "+ 利用を追加"}
         </button>
       </div>
-      <p className="mb-3 text-xs text-slate-500">カードの利用分を追加すると残高に加算されます。</p>
+      <p className="mb-3 text-meta text-muted">カードの利用分を追加すると残高に加算されます。</p>
 
       {open && (
-        <div className="mb-4 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-3">
-          <label className="block text-sm">
+        <div className="mb-4 grid gap-3 rounded-control bg-surface-raised p-4 sm:grid-cols-3">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">利用日</span>
             <input type="date" className={input} value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">利用額（円）</span>
             <input type="number" min={1} className={input} value={amount || ""} onChange={(e) => setAmount(Number(e.target.value))} />
-            {amount > 0 && <span className="mt-1 block text-xs text-slate-400">{fmtJPY(amount)}</span>}
+            {amount > 0 && <span className="mt-1 block text-meta text-muted">{fmtJPY(amount)}</span>}
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">メモ</span>
             <input type="text" className={input} value={note} onChange={(e) => setNote(e.target.value)} placeholder="例：家電購入" />
           </label>
           <div className="sm:col-span-3">
-            <button onClick={add} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+            <button onClick={add} className="rounded-control bg-accent px-4 py-2 text-meta font-medium text-accent-on hover:bg-accent/85">
               追加する
             </button>
           </div>
@@ -88,11 +88,11 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
       )}
 
       {list.length === 0 ? (
-        <p className="text-sm text-slate-500">利用記録はまだありません。</p>
+        <p className="text-meta text-muted">利用記録はまだありません。</p>
       ) : (
-        <table className="w-full text-sm">
+        <table className="w-full text-meta">
           <thead>
-            <tr className="text-left text-xs text-slate-500">
+            <tr className="text-left text-meta text-muted">
               <th className="py-2 pr-4">日付</th>
               <th className="py-2 pr-4 text-right">利用額</th>
               <th className="py-2 pr-4">メモ</th>
@@ -101,12 +101,12 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
           </thead>
           <tbody>
             {list.map((c) => (
-              <tr key={c.id} className="border-t border-slate-100 tabular-nums">
+              <tr key={c.id} className="border-t border-border tabular-nums">
                 <td className="py-1.5 pr-4">{c.date}</td>
-                <td className="py-1.5 pr-4 text-right text-red-600">+{fmtJPY(c.amount)}</td>
-                <td className="py-1.5 pr-4 text-slate-500">{c.note}</td>
+                <td className="py-1.5 pr-4 text-right text-danger">+{fmtJPY(c.amount)}</td>
+                <td className="py-1.5 pr-4 text-muted">{c.note}</td>
                 <td className="py-1.5 text-right">
-                  <button onClick={() => setConfirmId(c.id)} className="text-xs text-red-600 hover:underline">削除</button>
+                  <button onClick={() => setConfirmId(c.id)} className="text-meta text-danger hover:underline">削除</button>
                 </td>
               </tr>
             ))}
@@ -117,4 +117,4 @@ export default function ChargeRecorder({ loan, onChange }: { loan: Loan; onChang
   );
 }
 
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const input = "w-full rounded-control border border-border bg-surface-raised px-3 py-2.5 text-meta outline-none focus:border-accent focus:ring-2 focus:ring-accent/25";

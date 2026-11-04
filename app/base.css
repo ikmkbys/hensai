@@ -1,0 +1,361 @@
+/* ============================================================================
+   base.css — Stellars UI / 不変層
+   ----------------------------------------------------------------------------
+   ここは「アプリをまたいで共有する思想」。アプリ側では原則編集しない。
+   持っているのは “名前” と “使い方のルール” だけで、色・影・寸法の
+   実際の “値” は theme-*.css 側が持つ。
+   → このファイルを読めば「何を使ってよいか」が分かり、
+      theme を差し替えれば見た目だけが変わる、という関係を保つこと。
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. TAILWIND THEME / 色
+   色は @theme inline（テーマ差し替えに自動追従させるため inline 必須）。
+   ここに並ぶ名前が「使ってよい色の全部」。Tailwind 組み込みのパレット
+   （gray-500 / blue-600 …）は使わない。意味のない色が混ざった瞬間に
+   テーマ差し替えが壊れる。
+   --------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);                    /* ページの地。ここに影を落とす */
+  --color-surface: var(--surface);                          /* カード・シートなど内容を載せる面 */
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-raised: var(--surface-raised);            /* 面の上のチップ・タグ・入力欄 */
+  --color-surface-raised-hover: var(--surface-raised-hover);
+
+  --color-foreground: var(--foreground);                    /* 本文 */
+  --color-muted: var(--muted);                              /* 補助テキスト。本文と同じ重さで読ませない情報 */
+  --color-muted-weak: var(--muted-weak);                    /* 押せない・範囲外のグリフ専用。文章には使わない */
+
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);                    /* アクセント色の面（チップ背景など） */
+  --color-accent-dim-hover: var(--accent-dim-hover);
+  --color-accent-ink: var(--accent-ink);                    /* データ描画専用。accent と同色相で彩度を落とした版 */
+  --color-danger: var(--danger);                            /* 破壊的操作のみ。警告・注意喚起には使わない */
+
+  --color-border: var(--border);                            /* 内容を「囲む」線: カード・入力欄の輪郭 */
+  --color-border-strong: var(--border-strong);              /* 内容を「分ける」線: セクション間の罫・状態行の下線。
+                                                               囲む線より強い。この2用途以外に使わない */
+}
+
+/* 線は情報を持たせない。
+   border 系は地との比が 1.3〜1.8:1 しかなく（暗いテーマ・明るいテーマとも）、
+   「そこに何かがある」ことを線だけで伝えることはできない。
+   押せる要素・入力できる要素は必ず面（--surface-raised）で示し、線は形を整える役に留める。
+   線を濃くして解決しようとしないこと（濃い罫は画面を紙面ではなく表計算にする）。 */
+
+/* 色トークンが扱うのは “UI の色” だけ。
+   本の装丁・カテゴリ色・ユーザーが選んだ色のような “コンテンツ由来の色” は
+   トークンではなくデータが持つ。ここに足さない。 */
+
+/* 色だけで情報を伝えない。
+   選択中・現在地・成功・異常などの状態は、色に加えて
+   「面 / 形 / 線や文字の太さ / 位置 / 文字そのもの」のどれかでも必ず示す。
+   確認方法: html に filter: grayscale(1) を当てて、状態が読み取れるかを見る。
+   （accent は色相を持つだけで明度が地と近いことがあり、色を抜くと消える） */
+
+/* ---------------------------------------------------------------------------
+   2. TAILWIND THEME / 構造
+   値そのものなので素の @theme（自己参照を避ける）。
+   組み込みのスケール名（rounded-lg / text-sm / ease-out …）は絶対に上書きしない。
+   すべて「意味」で名付ける — サイズを見た目で選ばせないことが目的。
+   --------------------------------------------------------------------------- */
+@theme {
+  /* 角丸 — 用途で決まる。迷ったら「その要素は何か」を先に決める */
+  --radius-bar: 4px;      /* グラフの棒・プログレスバーの天面 */
+  --radius-cell: 8px;     /* カレンダーのマスのような格子の1マス */
+  --radius-media: 8px;    /* 画像・サムネイル・カバー */
+  --radius-control: 12px; /* 入力欄・ボタン・キー・タイル ← 44px 級の操作要素はすべてこれ */
+  --radius-card: 16px;    /* カード・シートの上端 */
+  --radius-pill: 9999px;  /* チップ・バッジ・アバター */
+
+  --ease-standard: cubic-bezier(.4, 0, .2, 1);
+  --ease-decelerate: cubic-bezier(.2, .8, .3, 1);
+
+  /* 文字サイズ — 6段。組み込み名(xs/sm/base/lg/xl/2xl…)は絶対に使わない。
+     色トークン名(muted, accent, border…)と衝突する名前も禁止
+     （--color-muted は text-muted を生成済み。同名の --text-* を作ると壊れる）。
+     日本語は字面が em を埋めるため、Latin 基準より行間を広く・小サイズの字間を広く取る。 */
+  --text-micro: 0.75rem;        /* 12px 数字と1〜2文字ラベル専用。文章には使わない */
+  --text-micro--line-height: 1.5;
+  --text-micro--letter-spacing: 0.02em;
+
+  --text-meta: 0.875rem;        /* 14px ラベル・キャプション・チップ・カード見出し */
+  --text-meta--line-height: 1.6;
+  --text-meta--letter-spacing: 0.01em;
+
+  --text-body: 0.9375rem;       /* 15px 文章はすべてここ */
+  --text-body--line-height: 1.8;
+
+  --text-title: 1.25rem;        /* 20px セクション見出し・シート見出し */
+  --text-title--line-height: 1.45;
+
+  --text-section: 1.875rem;     /* 30px 中間段。統計タイルの数字 */
+  --text-section--line-height: 1.2;
+  --text-section--letter-spacing: -0.01em;
+
+  --text-figure: 2.75rem;       /* 44px 画面にひとつだけの、主役の数字 */
+  --text-figure--line-height: 1;
+  --text-figure--letter-spacing: -0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   3. フォーカス
+   個別に outline を書かない。ここ1箇所で全部処理する。
+   （個別指定が始まると必ず「一部だけフォーカスが見えない」画面が生まれる）
+   --------------------------------------------------------------------------- */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-control);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4. 段差（奥行き）
+   影は「親の背景が --background である要素」にのみ付ける。
+   カードの中のカードに影を付けると、奥行きではなく汚れに見える。
+   実際に付けてよいのは ページ直下のカード / ナビ / シート / トースト / ヘッダー だけ。
+   --surface-raised のチップには付けない。
+   inset のハイライトは暗いテーマで面を起こすためのもの。明るいテーマでは
+   --hairline を transparent にして無効化する（＝ハイライトは可変層の判断）。
+   --------------------------------------------------------------------------- */
+@layer components {
+  .elevate-1 { box-shadow: var(--shadow-1), inset 0 1px 0 var(--hairline); }
+  .elevate-2 { box-shadow: var(--shadow-2), inset 0 1px 0 var(--hairline); }
+  .elevate-3 { box-shadow: var(--shadow-3), inset 0 1px 0 var(--hairline); }
+  .elevate-4 { box-shadow: var(--shadow-4), inset 0 1px 0 var(--hairline); }
+  .elevate-nav { box-shadow: var(--shadow-nav); }
+}
+
+/* ---------------------------------------------------------------------------
+   5. 土台
+   --------------------------------------------------------------------------- */
+/* スクロールバーの分の隙間を最初から空けておく。
+   ページの縦の長さでスクロールバーが出たり消えたりすると、中央寄せの要素が
+   その半分（ここでは3px）だけ横に飛ぶ。ページを移動するたびにヘッダーが
+   小さく左右へ動いて見える原因がこれ。 */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: var(--page-bg, var(--background));  /* グラデ等を敷きたいテーマは --page-bg を定義する */
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans-jp), -apple-system, BlinkMacSystemFont,
+               "Hiragino Sans", "Yu Gothic", sans-serif;
+  line-break: strict;               /* 日本語の行頭禁則 */
+}
+
+/* モーダルの幕は --overlay を使う。bg-black/35 のような直書きをしない。
+   「どれだけ暗くすれば奥に見えるか」は地の明るさで変わる＝テーマの判断だから */
+
+/* ---------------------------------------------------------------------------
+   4状態 — 正常系だけ作って終わらせないための土台
+   どの画面も「空 / 読込中 / エラー / 大量」を必ず用意する。
+   個人開発のUIが安っぽく見える原因の大半は、正常系しか無いこと。
+   - 読込中: スピナーではなく .skeleton で「これから何が出るか」の形を見せる
+              （スピナーは何が来るか分からないので体感待ち時間が伸びる）
+   - エラー: 原因と次の一手を書く。ユーザーのせいにしない
+   - 大量:   件数が増えても崩れないこと（省略・折返し・スクロールの逃げ道を用意する）
+   --------------------------------------------------------------------------- */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .55; }
+}
+.skeleton {
+  background: var(--surface-raised);
+  border-radius: var(--radius-media);
+  animation: skeleton-pulse 1.4s var(--ease-standard) infinite;
+}
+
+/* 器の幅はアプリでひとつ。ページごとに変えない。
+   ヘッダー・ナビ・本文がすべて同じ .app-width を使うことで、左右の端が必ず揃う。
+   画面を移動するたびに幅が伸び縮みすると、同じアプリを使っている感覚が壊れる
+   （「読み物のページだけ狭くしたい」は器ではなく“中のブロック”の max-width で解く）。 */
+.app-width {
+  width: 100%;
+  max-width: var(--app-max-w);
+  margin-inline: auto;
+}
+
+/* 器を広げる前に「広げた幅を使い切る中身があるか」を数えること。
+   一度 1024px に広げてみたが、実際に使い切れたのは本棚のグリッドだけで、
+   残りの画面は読み物幅（672px）のままだった。結果、ヘッダー（1024px）と
+   ページの中身（672px）で左右の端が 176px ずれ、ページ移動でも中身の幅が変わった。
+   ＝ 器をひとつにした理由そのものを壊した。
+   広い画面を使いたいときは器を広げるのではなく、中身の並べ方を変える
+   （一覧を1列のリストから多列のグリッドにする）。列が増えれば幅は自然に埋まる。 */
+
+/* 毎ページ必要なもの（ヘッダー・ナビ・フッター）は「器」が持つ。
+   ページ側で書き足す形にすると、必ず抜ける画面が出る（実際 hensai / near-stars /
+   solar-system にはフッターが1つも無い）。忘れうるものは既定で入れて、
+   要らない画面だけ降ろす（オプトアウト）にすること。 */
+
+/* 「表示の状態」と「操作の入口」は別の話。
+   空 / 読込中 / エラー / 大量 を作っても、それは見え方を揃えただけで、
+   作る・足すための入口が用意されたわけではない。
+   空状態のCTAだけに「追加」を置くと、1件でもデータがある人は二度と追加できなくなる。
+   画面ごとに「ここから何ができるか」を数え、主要な操作はどの画面からも届く場所に出すこと。 */
+
+/* その画面でしか意味を持たない設定は、その画面に置く。
+   並び順・表示形式・絞り込みは「結果が見えている場所」で選ぶもので、
+   設定画面に置くと、選んだ結果を確かめられないまま決めさせることになる。
+   設定画面に置いてよいのは、アプリ全体の挙動（通知・アカウント・データ・テーマ）だけ。 */
+
+/* アプリには「なぜ作ったか」を書いたページを必ず置き、
+   ヘッダーのアプリ名の隣（？）からどの画面でも開けるようにする。
+   書くのは機能の一覧ではなく、作った動機・大事にしたこと・あえて作らなかったもの。
+   道具としての出来が似通っていくほど、ここだけが代わりのきかない部分になる。
+   設計書のコンセプト章がそのまま原稿になる（先に設計書を書いていれば書き下ろす必要はない）。 */
+
+/* 固定ナビぶんの余白は1箇所に集約する（各ページで padding を書き足さない） */
+.pb-nav { padding-bottom: calc(var(--nav-h) + 1rem + env(safe-area-inset-bottom)); }
+
+/* 数値は等幅で桁を揃える。並んだ数字が揃わないのが素人臭さの最短経路 */
+.tabular-nums {
+  font-family: var(--font-num), ui-monospace, "Cascadia Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+button {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 押せるものは最小 44px（リスト行は 56px）。指はポインタより太い */
+button, a, label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea, select {
+  color-scheme: var(--scheme, light);
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-bar);
+}
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ---------------------------------------------------------------------------
+   6. モーション
+   「動かさない」設定を尊重する。ここは例外を作らない。
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in var(--dur-base) var(--ease-decelerate); }
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.85); }
+  60% { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-pop { animation: pop 0.25s var(--ease-decelerate); }
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.animate-fade-out { animation: fade-out 0.18s ease-in forwards; }
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.animate-slide-up { animation: slide-up var(--dur-sheet) var(--ease-decelerate); }
+
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+.animate-slide-down { animation: slide-down 0.18s ease-in forwards; }
+
+/* ---------------------------------------------------------------------------
+   利用者が書いた文章の型（マークダウン出力）
+   本文だけの画面ばかり作っていると、見出し・箇条書き・引用に型が無いことに
+   気づけない。書ける人の受け皿として、ここで一式に型を与えておく。
+   Tailwind の preflight が ul/ol の記号を消すので、明示的に戻すこと。
+   --------------------------------------------------------------------------- */
+.md-body {
+  font-size: var(--text-body);
+  line-height: 1.8;
+  overflow-wrap: anywhere;          /* 長いURLで横スクロールを出さない */
+}
+.md-body > * + * { margin-top: 0.9em; }
+
+.md-body h1, .md-body h2, .md-body h3 { font-weight: 700; line-height: 1.5; }
+.md-body > h1 + *, .md-body > h2 + *, .md-body > h3 + * { margin-top: 0.4em; }
+.md-body > * + h1, .md-body > * + h2, .md-body > * + h3 { margin-top: 1.6em; }
+.md-body h1 { font-size: var(--text-title); }
+.md-body h2 { font-size: var(--text-body); }
+.md-body h3 { font-size: var(--text-meta); color: var(--muted); }
+
+.md-body ul { list-style: disc; padding-left: 1.3em; }
+.md-body ol { list-style: decimal; padding-left: 1.5em; }
+.md-body li::marker { color: var(--muted-weak); }
+.md-body li + li { margin-top: 0.35em; }
+
+/* 読書メモでは引用が主役になる。線は「分ける」側の強さを使う */
+.md-body blockquote {
+  border-left: 2px solid var(--border-strong);
+  padding-left: 0.9em;
+  color: var(--muted);
+}
+
+.md-body code {
+  font-family: var(--font-num), ui-monospace, "Cascadia Mono", monospace;
+  font-size: 0.92em;
+  background: var(--surface-raised);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-bar);
+}
+.md-body pre {
+  background: var(--surface-raised);
+  padding: 0.75em 0.9em;
+  border-radius: var(--radius-media);
+  overflow-x: auto;                 /* 広い中身は自分の中でスクロールさせる */
+}
+.md-body pre code { background: none; padding: 0; }
+
+.md-body a {
+  color: var(--accent);
+  text-decoration: underline;       /* リンクを色だけで示さない */
+  text-underline-offset: 4px;
+}
+.md-body hr {
+  border: 0;
+  border-top: 1px solid var(--border-strong);
+  margin: 1.5em 0;
+}
+.md-body strong { font-weight: 700; }
+.md-body em { font-style: normal; background: linear-gradient(transparent 62%, var(--accent-dim) 62%); }
+
+/* GFM の表。狭い画面でページごと横に伸ばさない */
+.md-body table { width: 100%; border-collapse: collapse; font-size: var(--text-meta); display: block; overflow-x: auto; }
+.md-body th, .md-body td { border-bottom: 1px solid var(--border); padding: 0.5em 0.6em; text-align: left; white-space: nowrap; }
+.md-body th { color: var(--muted); font-weight: 500; }
+
+/* 検索語のハイライト。ブラウザ既定の黄色は、どのテーマにも属さない色なので必ず上書きする。
+   面（accent-dim）＋文字の太さで示し、色だけに頼らない */
+mark {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 0 0.15em;
+}

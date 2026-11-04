@@ -16,7 +16,7 @@ export default function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #1e1b4b 0%, #3730a3 60%, #4f46e5 100%)",
+          background: "radial-gradient(circle at 15% 0%, rgba(230,180,80,0.30) 0%, rgba(230,180,80,0) 55%), #15181d",
           fontFamily: "sans-serif",
           padding: "60px",
         }}

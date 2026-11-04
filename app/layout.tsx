@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { Analytics } from "@vercel/analytics/next";
+
+/* base.css が参照するフォント変数名は固定（--font-sans-jp / --font-num） */
+const sansJp = Noto_Sans_JP({
+  variable: "--font-sans-jp",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+const mono = JetBrains_Mono({
+  variable: "--font-num",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "HENSAI — 前向きにクリア",
@@ -23,25 +36,25 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className="h-full antialiased">
-      <body className="min-h-screen bg-slate-50 text-slate-900">
+    <html lang="ja" className={`${sansJp.variable} ${mono.variable} h-full antialiased`}>
+      <body className="min-h-screen text-foreground">
         <Nav />
-        <main className="mx-auto max-w-5xl px-4 py-6 md:py-10">{children}</main>
-        <footer className="mx-auto max-w-5xl border-t border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
+        <main className="app-width px-4 py-6 md:px-6 md:py-10">{children}</main>
+        <footer className="app-width border-t border-border px-4 py-8 text-center text-meta text-muted md:px-6">
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <a
               href="https://stellars-lab.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-slate-500 hover:text-indigo-600 transition-colors"
+              className="font-medium text-muted underline underline-offset-4 hover:text-foreground transition-colors"
             >
               Stellars Lab
             </a>
-            <a href="/privacy" className="hover:text-slate-600 transition-colors">プライバシーポリシー</a>
-            <a href="/terms" className="hover:text-slate-600 transition-colors">利用規約</a>
-            <a href="/help" className="hover:text-slate-600 transition-colors">ヘルプ</a>
+            <a href="/privacy" className="underline underline-offset-4 hover:text-foreground transition-colors">プライバシーポリシー</a>
+            <a href="/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">利用規約</a>
+            <a href="/help" className="underline underline-offset-4 hover:text-foreground transition-colors">ヘルプ</a>
           </div>
-          <p className="mt-3">© {new Date().getFullYear()} Stellars Lab. All rights reserved.</p>
+          <p className="mt-3 text-micro">© {new Date().getFullYear()} Stellars Lab. All rights reserved.</p>
         </footer>
       </body>
     </html>

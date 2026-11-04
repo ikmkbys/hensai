@@ -14,7 +14,7 @@ export default function NewLoanPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-xl font-bold">新しい借入を登録</h1>
+      <h1 className="text-title font-bold">新しい借入を登録</h1>
       <LoanForm
         submitLabel="登録する"
         usedColors={usedColors}

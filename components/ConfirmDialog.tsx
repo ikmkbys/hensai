@@ -12,20 +12,20 @@ type Props = {
 export default function ConfirmDialog({ open, title, message, confirmLabel = "削除する", onConfirm, onCancel }: Props) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="mb-2 text-lg font-bold">{title}</h2>
-        <p className="mb-5 whitespace-pre-wrap text-sm text-slate-600">{message}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-4">
+      <div className="w-full max-w-md rounded-card bg-surface p-6 elevate-4">
+        <h2 className="mb-2 text-title font-bold">{title}</h2>
+        <p className="mb-5 whitespace-pre-wrap text-meta text-muted">{message}</p>
         <div className="flex gap-2">
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+            className="flex-1 rounded-control border border-danger/50 bg-surface px-4 py-2 text-meta font-medium text-danger hover:bg-danger/10"
           >
             {confirmLabel}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className="flex-1 rounded-control border border-border bg-surface px-4 py-2 text-meta text-muted hover:bg-surface-hover"
           >
             キャンセル
           </button>

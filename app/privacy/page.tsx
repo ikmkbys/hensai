@@ -3,12 +3,12 @@ export const metadata = { title: "プライバシーポリシー — HENSAI" };
 export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-16">
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-6">
-        <h1 className="text-2xl font-bold">プライバシーポリシー</h1>
-        <p className="mt-1 text-xs text-slate-400">最終更新日：2026年4月21日</p>
+      <div className="rounded-card bg-gradient-to-br from-accent-dim to-surface p-6">
+        <h1 className="text-section font-bold">プライバシーポリシー</h1>
+        <p className="mt-1 text-meta text-muted">最終更新日：2026年4月21日</p>
       </div>
 
-      <p className="text-sm text-slate-600">
+      <p className="text-meta text-muted">
         Stellars Lab（以下「当方」）は、「HENSAI」（以下「本サービス」）における個人情報の取り扱いについて、以下の通りポリシーを定めます。
       </p>
 
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="2. 利用目的">
-        <ul className="list-disc list-inside space-y-1 text-slate-600">
+        <ul className="list-disc list-inside space-y-1 text-muted">
           <li>本サービスの提供・安定運営</li>
           <li>不正アクセス・障害の検知（アクセスログの範囲内）</li>
         </ul>
@@ -34,13 +34,13 @@ export default function PrivacyPage() {
           当方は収集した情報を、法令に基づく場合を除き第三者に提供しません。
         </p>
         <p className="mt-2">本サービスでは以下の外部サービスを利用しています：</p>
-        <ul className="mt-2 list-disc list-inside space-y-1 text-slate-600">
-          <li><span className="font-medium text-slate-700">Vercel</span>：ウェブサイトのホスティング。アクセスログが収集される場合があります</li>
+        <ul className="mt-2 list-disc list-inside space-y-1 text-muted">
+          <li><span className="font-medium text-foreground">Vercel</span>：ウェブサイトのホスティング。アクセスログが収集される場合があります</li>
         </ul>
       </Section>
 
       <Section title="4. データの管理">
-        <ul className="list-disc list-inside space-y-1 text-slate-600">
+        <ul className="list-disc list-inside space-y-1 text-muted">
           <li>借入情報・返済履歴はすべてお使いのブラウザのみに保存されます</li>
           <li>「設定」画面のCSVエクスポートからデータをバックアップできます</li>
           <li>ブラウザの「サイトデータを削除」操作でデータをいつでも完全削除できます</li>
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
       <Section title="お問い合わせ">
         <p>
           本ポリシーに関するお問い合わせは{" "}
-          <a href="mailto:stellarsbit@gmail.com" className="text-indigo-600 hover:underline">
+          <a href="mailto:stellarsbit@gmail.com" className="text-accent hover:underline">
             stellarsbit@gmail.com
           </a>{" "}
           までご連絡ください。
@@ -74,9 +74,9 @@ export default function PrivacyPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h2 className="mb-3 font-bold text-slate-800">{title}</h2>
-      <div className="text-sm text-slate-600 leading-relaxed">{children}</div>
+    <section className="rounded-card border border-border bg-surface p-5">
+      <h2 className="mb-3 font-bold text-foreground">{title}</h2>
+      <div className="text-meta text-muted leading-relaxed">{children}</div>
     </section>
   );
 }

@@ -1,0 +1,83 @@
+/* ============================================================================
+   theme.css — HENSAI「夜の作業台」
+   ----------------------------------------------------------------------------
+   トーン：夜、暗い作業台にスタンドの灯りがひとつ。灯り＝アクセントの琥珀色だけ。
+   暗いテーマ1本（切り替えなし）。数字と向き合う場面を静かに照らす。
+   base.css は編集しない。ここは値だけ。
+   コントラスト検算（node contrast.js 相当 / 2026-11-04）:
+     foreground/surface 13.10  muted/surface 6.83  muted/raised 5.95
+     muted-weak/surface 4.21  muted-weak/raised 3.67（3:1以上）
+     accent/surface 8.57  accent/accent-dim 6.89  danger/surface 6.48
+     accent-ink(=--accent-on, 琥珀ボタン上の文字)/accent 9.33
+   ============================================================================ */
+
+:root {
+  --scheme: dark;
+  color-scheme: dark;
+
+  /* --- 面（青みを含んだ鋼の黒。純黒にすると影が置けない） ------------- */
+  --background: #15181d;
+  --surface: #1c2027;
+  --surface-hover: #222731;
+  --surface-raised: #262b33;
+  --surface-raised-hover: #2f353f;
+
+  /* --- 文字 ----------------------------------------------------------- */
+  --foreground: #e8e6e1;
+  --muted: #a2a8b2;
+  --muted-weak: #7a828e;
+
+  /* --- アクセント：スタンドの琥珀（danger の赤とは色相を離してある） ---- */
+  --accent: #e6b450;
+  --accent-dim: #3a2f17;
+  --accent-dim-hover: #47391c;
+  --accent-ink: #c99a3c;               /* データ描画専用 */
+  --accent-on: #15181d;                /* 琥珀の面の上に置く文字 */
+  --danger: #ff7b72;
+
+  /* --- 線 ------------------------------------------------------------- */
+  --border: #2a2f38;
+  --border-strong: #3a404b;
+
+  --hairline: rgba(255, 255, 255, 0.05);
+  --overlay: rgba(6, 8, 11, 0.7);
+
+  /* --- 影 ------------------------------------------------------------- */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.34), 0 2px 6px -1px rgba(0,0,0,.26);
+  --shadow-2: 0 2px 4px rgba(0,0,0,.36), 0 8px 16px -3px rgba(0,0,0,.32);
+  --shadow-3: 0 4px 8px rgba(0,0,0,.38), 0 16px 32px -6px rgba(0,0,0,.40);
+  --shadow-4: 0 8px 16px rgba(0,0,0,.42), 0 28px 56px -10px rgba(0,0,0,.52);
+  --shadow-nav: 0 -6px 20px rgba(0,0,0,.34);
+
+  /* 灯りが机に落ちる：左上にだけ琥珀のにじみ */
+  --page-bg:
+    radial-gradient(56rem 34rem at 12% -12%, rgba(230, 180, 80, 0.07), transparent 62%),
+    var(--background);
+
+  /* --- チャート（系列は借入ごとの色＝データ由来。ここは基準線など） ---- */
+  --chart-ref: #7a828e;
+  --chart-1: #e6b450;  --chart-2: #5fc39a;  --chart-3: #79b4e0;  --chart-4: #b39ae8;
+
+  /* --- 構造の定数 ----------------------------------------------------- */
+  --z-sticky: 10; --z-header: 30; --z-nav: 40; --z-toast: 45; --z-modal: 50;
+  --dur-press: 100ms; --dur-fast: 150ms; --dur-base: 200ms; --dur-sheet: 220ms;
+  --nav-h: 3.75rem;
+  --app-max-w: 64rem;
+}
+
+/* base.css の語彙に無い、このアプリだけの色名（琥珀の面の上の文字） */
+@theme inline {
+  --color-accent-on: var(--accent-on);
+}
+
+/* 良い状態（完済・達成など）。琥珀のアクセントや danger と色相を離した緑。
+   色だけに頼らず、必ず文字でも示すこと。
+   positive/surface 8.0以上・positive/accent-dim 系は面の上で使う */
+:root {
+  --positive: #5fc39a;
+  --positive-dim: #173528;
+}
+@theme inline {
+  --color-positive: var(--positive);
+  --color-positive-dim: var(--positive-dim);
+}

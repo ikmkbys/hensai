@@ -29,22 +29,22 @@ export default function BalanceAdjust({ loan, onChange }: { loan: Loan; onChange
   const diff = balance - loan.currentBalance;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="rounded-card border border-border bg-surface p-5">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-semibold">残高の修正</h2>
-          <p className="mt-0.5 text-xs text-slate-500">残高証明書と計算値がズレたときに使用</p>
+          <p className="mt-0.5 text-meta text-muted">残高証明書と計算値がズレたときに使用</p>
         </div>
         <button
           onClick={() => { setOpen((v) => !v); setBalance(loan.currentBalance); }}
-          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+          className="rounded-control border border-border-strong bg-surface px-4 py-2 text-meta hover:bg-surface-hover"
         >
           {open ? "キャンセル" : "残高を修正する"}
         </button>
       </div>
       {open && (
-        <div className="mt-4 space-y-3 rounded-xl bg-slate-50 p-4">
-          <label className="block text-sm">
+        <div className="mt-4 space-y-3 rounded-control bg-surface-raised p-4">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">正しい残高（円）</span>
             <input
               type="number"
@@ -54,17 +54,17 @@ export default function BalanceAdjust({ loan, onChange }: { loan: Loan; onChange
               onChange={(e) => setBalance(Number(e.target.value))}
             />
             {balance !== loan.currentBalance && (
-              <span className={`mt-1 block text-xs ${diff > 0 ? "text-red-500" : "text-emerald-600"}`}>
+              <span className={`mt-1 block text-meta ${diff > 0 ? "text-danger" : "text-positive"}`}>
                 現在 {fmtJPY(loan.currentBalance)} → {diff > 0 ? `+${fmtJPY(diff)}（増加）` : `${fmtJPY(diff)}（減少）`}
               </span>
             )}
           </label>
-          <label className="block text-sm">
+          <label className="block text-meta">
             <span className="mb-1 block font-medium">メモ（任意）</span>
             <input type="text" className={input} value={note} onChange={(e) => setNote(e.target.value)} placeholder="例：2026年4月残高証明書に合わせて修正" />
-            <span className="mt-1 block text-xs text-slate-400">入力すると借入のメモ欄に履歴として追記されます</span>
+            <span className="mt-1 block text-meta text-muted">入力すると借入のメモ欄に履歴として追記されます</span>
           </label>
-          <button onClick={save} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+          <button onClick={save} className="rounded-control bg-accent px-4 py-2 text-meta font-medium text-accent-on hover:bg-accent/85">
             修正を確定する
           </button>
         </div>
@@ -73,4 +73,4 @@ export default function BalanceAdjust({ loan, onChange }: { loan: Loan; onChange
   );
 }
 
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const input = "w-full rounded-control border border-border bg-surface-raised px-3 py-2.5 text-meta outline-none focus:border-accent focus:ring-2 focus:ring-accent/25";
