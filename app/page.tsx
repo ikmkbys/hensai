@@ -220,7 +220,7 @@ export default function HomePage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2} stroke="none">
                   {pieData.map((d, i) => <Cell key={i} fill={d.color || "var(--accent)"} />)}
                 </Pie>
                 <Tooltip formatter={(v) => fmtJPY(v as number)} {...tooltipStyle} />
