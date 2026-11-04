@@ -62,6 +62,19 @@ describe("複数の借入", () => {
     expect(ava.months).toBeLessThan(base.months);
     expect(ava.totalInterest).toBeLessThan(base.totalInterest);
   });
+  it("追加ゼロ＋完済分を回さない設定なら、現状と同じ結果になる（差が出るのは回す設定のときだけ）", () => {
+    const base = simulateStrategy([A, B], 0, "baseline");
+    for (const key of ["avalanche", "snowball"] as const) {
+      const r = simulateStrategy([A, B], 0, key, false);
+      expect(r.months).toBe(base.months);
+      expect(r.totalInterest).toBe(base.totalInterest);
+    }
+  });
+  it("完済分を回さなくても、追加返済があれば利息は減る", () => {
+    const base = simulateStrategy([A, B], 0, "baseline");
+    const r = simulateStrategy([A, B], 10000, "avalanche", false);
+    expect(r.totalInterest).toBeLessThan(base.totalInterest);
+  });
   it("追加返済が増えるほど総利息は減る", () => {
     const a = simulateStrategy([A, B], 5000, "avalanche").totalInterest;
     const b = simulateStrategy([A, B], 20000, "avalanche").totalInterest;

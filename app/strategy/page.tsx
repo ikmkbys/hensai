@@ -17,6 +17,7 @@ const LABEL: Record<StrategyKey, string> = {
 export default function StrategyPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [extra, setExtra] = useState<number>(0);
+  const [rollover, setRollover] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,9 +29,9 @@ export default function StrategyPage() {
 
   const results = useMemo(() => {
     const out = {} as Record<StrategyKey, StrategyResult>;
-    for (const k of KEYS) out[k] = simulateStrategy(active, extra, k);
+    for (const k of KEYS) out[k] = simulateStrategy(active, extra, k, rollover);
     return out;
-  }, [active, extra]);
+  }, [active, extra, rollover]);
 
   if (!mounted) return null;
 
@@ -49,6 +50,7 @@ export default function StrategyPage() {
   // 完済できる方法のうち総利息が最も少ないもの
   const best = KEYS.filter((k) => k !== "baseline" && results[k].feasible)
     .sort((a, b) => results[a].totalInterest - results[b].totalInterest)[0];
+  const gain = best && results[best].feasible && base.feasible ? base.totalInterest - results[best].totalInterest : 0; // 上乗せしない場合との利息の差
   const avaOrder = priorityOrder(active, "avalanche");
   const snowOrder = priorityOrder(active, "snowball");
   const sameOrder = avaOrder.map((l) => l.id).join() === snowOrder.map((l) => l.id).join();
@@ -62,7 +64,7 @@ export default function StrategyPage() {
         <ul className="mt-2 space-y-1 text-meta leading-7 text-muted">
           <li>・毎月の返済は、<span className="text-foreground">どの借入も決まった額を全部払う</span>前提です。ここで選ぶものではありません。</li>
           <li>・比べるのは、毎月の返済とは別に<span className="text-foreground">余らせて回せるお金を、どの借入に上乗せするか</span>だけです。</li>
-          <li>・完済した借入の毎月の返済額は、次の月から上乗せ先へ回していきます。</li>
+          <li>・完済した借入の返済額を次の借入へ回し続けるかどうかは、下のチェックで選べます。</li>
         </ul>
       </section>
 
@@ -71,10 +73,22 @@ export default function StrategyPage() {
           <span className="mb-1 block text-meta font-medium">毎月の上乗せ額（円）</span>
           <input type="number" min={0} className={input} value={extra || ""} placeholder="0" onChange={(e) => setExtra(Math.max(0, Number(e.target.value)))} />
         </label>
-        <p className="mt-2 text-meta text-muted">毎月の決まった返済とは別に、余らせて回せる金額。0円のままだと、下の差は「完済した借入の返済額を次へ回す分」だけになります。</p>
+        <p className="mt-2 text-meta text-muted">毎月の決まった返済とは別に、余らせて回せる金額。</p>
+
+        <label className="mt-4 flex cursor-pointer items-start gap-3">
+          <input type="checkbox" checked={rollover} onChange={(e) => setRollover(e.target.checked)} className="mt-1 h-5 w-5 flex-shrink-0 accent-accent" />
+          <span className="text-meta">
+            <span className="font-medium">完済した借入の返済額も、次の借入へ回す</span>
+            <span className="mt-1 block text-muted">
+              {rollover
+                ? "オン：借入を1件完済したら、その月々の返済額を払い続けて次の借入へ充てる前提です。上乗せ額が0円でも差が出るのは、このためです。"
+                : "オフ：完済した借入の返済はそこで終わり、その分は回しません。上乗せ額が0円なら、どの方法も今のままと同じ結果になります。"}
+            </span>
+          </span>
+        </label>
       </section>
 
-      {best && results[best].feasible && base.feasible && (
+      {best && results[best].feasible && base.feasible && gain > 0 && (
         <section className="rounded-card border border-positive/30 bg-positive-dim p-5 text-foreground">
           <div className="text-meta text-positive">いちばん利息が少ない上乗せ先</div>
           <div className="mt-1 text-title font-bold">{LABEL[best]}</div>
@@ -83,6 +97,12 @@ export default function StrategyPage() {
             完済が <span className="font-bold tabular-nums">{base.months - results[best].months}ヶ月</span> 早まります。
           </div>
         </section>
+      )}
+
+      {best && results[best].feasible && base.feasible && gain <= 0 && (
+        <p className="rounded-control border border-border bg-surface px-4 py-3 text-meta text-muted">
+          いまの設定では、どの上乗せ先でも結果は同じです。上乗せ額を入れるか、「完済した借入の返済額も次へ回す」をオンにすると、差が出ます。
+        </p>
       )}
 
       <section className="overflow-x-auto rounded-card border border-border bg-surface">
@@ -100,8 +120,8 @@ export default function StrategyPage() {
               const r = results[k];
               const diff = r.feasible && base.feasible ? base.totalInterest - r.totalInterest : 0;
               return (
-                <tr key={k} className={`border-t border-border ${k === best ? "bg-positive-dim" : ""}`}>
-                  <td className="px-4 py-3 font-medium">{LABEL[k]}{k === best && <span className="ml-2 rounded-pill bg-positive-dim px-2 py-0.5 text-meta text-positive">おすすめ</span>}</td>
+                <tr key={k} className={`border-t border-border ${k === best && gain > 0 ? "bg-positive-dim" : ""}`}>
+                  <td className="px-4 py-3 font-medium">{LABEL[k]}{k === best && gain > 0 && <span className="ml-2 rounded-pill bg-positive-dim px-2 py-0.5 text-meta text-positive">おすすめ</span>}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.feasible ? `${r.finishDate ?? "—"}（${r.months}ヶ月）` : "要再計画"}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.feasible ? fmtJPY(r.totalInterest) : "∞"}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-positive">{k !== "baseline" && diff > 0 ? `${fmtJPY(diff)} 減` : "—"}</td>

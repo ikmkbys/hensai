@@ -46,7 +46,8 @@ function scheduledPayment(loan: Loan, balance: number, interest: number, monthNu
 
 type State = { loan: Loan; balance: number; grace: number; firstPay: number };
 
-export function simulateStrategy(loans: Loan[], extraMonthly: number, key: StrategyKey): StrategyResult {
+// rollover=false のとき、完済した借入の返済額は回さない（追加返済 extraMonthly だけを上乗せする）
+export function simulateStrategy(loans: Loan[], extraMonthly: number, key: StrategyKey, rollover = true): StrategyResult {
   const active = loans.filter((l) => l.currentBalance > 0);
   const base = new Date();
 
@@ -113,7 +114,7 @@ export function simulateStrategy(loans: Loan[], extraMonthly: number, key: Strat
       r.s.balance = Math.max(0, r.s.balance - principal);
       if (r.s.balance === 0) {
         payoffs.push({ loanId: r.s.loan.id, name: r.s.loan.name, date: ym });
-        rolled += r.s.firstPay; // 次の月から、この借入の返済額を他へ回す
+        if (rollover) rolled += r.s.firstPay; // 次の月から、この借入の返済額を他へ回す
       }
     }
   }
